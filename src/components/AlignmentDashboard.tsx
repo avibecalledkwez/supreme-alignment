@@ -1,9 +1,16 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { calculatePlanetaryHours, getSunTimes, PLANET_COLORS, PLANET_SYMBOLS, type PlanetaryHour } from '@/lib/planetary-hours'
-import { calculateNumerology, calculateAllPersonalHours } from '@/lib/numerology'
-import { findAlignments, type Alignment } from '@/lib/alignment-engine'
+import {
+  calculatePlanetaryHoursForDate,
+  findCurrentPlanetaryHour,
+  getSunTimes,
+  PLANET_COLORS,
+  PLANET_SYMBOLS,
+  type PlanetaryHour,
+} from '@/lib/planetary-hours'
+import { calculateNumerology, calculateAllPersonalHours, personalYear, personalMonth as calcPersonalMonth } from '@/lib/numerology'
+import { findAlignments, type Alignment, type AlignmentTier } from '@/lib/alignment-engine'
 
 interface UserProfile {
   first_name: string
@@ -18,24 +25,25 @@ interface TimelineEntry {
   personalHour: number
   alignments: Alignment[]
   clockHourLabel: string
+  bestTier: AlignmentTier | null
 }
 
-// Alignment detail descriptions for click-to-expand
+// Alignment details for expanded view
 const ALIGNMENT_DETAILS: Record<string, { description: string; examples: string[] }> = {
   financial: {
     description:
-      'This window occurs when expansive Jupiter or magnetic Venus governs the planetary hour while your personal numerological cycle hits a power frequency (3 or 8). This is when environmental abundance energy aligns with your internal manifestation cycle.',
+      'This window occurs when expansive Jupiter or magnetic Venus governs the planetary hour while your personal numerological cycle hits a power frequency (3 or 8). Environmental abundance energy aligns with your internal manifestation cycle.',
     examples: [
       'Execute stock trades or rebalance your portfolio',
       'Sign contracts, leases, or business agreements',
       'Launch a new product, service, or revenue stream',
-      'Send invoices or negotiate rates / salaries',
+      'Send invoices or negotiate rates and salaries',
       'Apply for funding, loans, or financial partnerships',
     ],
   },
   love: {
     description:
-      'This window occurs when Venus (love) or the Moon (emotion) governs the planetary hour while your personal cycle resonates at 2 (partnership) or 6 (harmony). Interpersonal magnetism and emotional intelligence peak during this alignment.',
+      'This window occurs when Venus (love) or the Moon (emotion) governs the planetary hour while your personal cycle resonates at 2 (partnership) or 6 (harmony). Interpersonal magnetism and emotional intelligence peak.',
     examples: [
       'Schedule a first date or plan a romantic evening',
       'Have a difficult but necessary conversation with a partner',
@@ -46,7 +54,7 @@ const ALIGNMENT_DETAILS: Record<string, { description: string; examples: string[
   },
   health: {
     description:
-      'This window occurs when the Sun (vitality) or Mars (physical energy) governs the planetary hour while your personal cycle hits 1 (new beginnings) or 4 (structure/discipline). Your body\'s receptivity to physical challenge and healing is amplified.',
+      'This window occurs when the Sun (vitality) or Mars (physical energy) governs the planetary hour while your personal cycle hits 1 (new beginnings) or 4 (structure). Your body\'s receptivity to physical challenge and healing is amplified.',
     examples: [
       'Start a new workout routine or try a new sport',
       'Do your most intense physical training of the day',
@@ -57,7 +65,7 @@ const ALIGNMENT_DETAILS: Record<string, { description: string; examples: string[
   },
   creativity: {
     description:
-      'This window occurs when Mercury (communication/intellect) or the Sun (self-expression) governs the planetary hour while your personal cycle resonates at 3 (expression) or 5 (freedom/adventure). Your creative bandwidth and originality peak here.',
+      'This window occurs when Mercury (intellect) or the Sun (self-expression) governs the planetary hour while your personal cycle resonates at 3 (expression) or 5 (freedom). Creative bandwidth and originality peak here.',
     examples: [
       'Brainstorm new ideas, strategies, or concepts',
       'Write, design, compose music, or create content',
@@ -68,8 +76,16 @@ const ALIGNMENT_DETAILS: Record<string, { description: string; examples: string[
   },
 }
 
+const TIER_COLORS: Record<AlignmentTier, string> = {
+  'standard': '',
+  'supreme': '#FFD700',
+  'super-supreme': '#FF6B2B',
+}
+
 export default function AlignmentDashboard({ profile }: { profile: UserProfile }) {
   const [now, setNow] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState<string>('')
+  const [isViewingToday, setIsViewingToday] = useState(true)
   const [currentPH, setCurrentPH] = useState<PlanetaryHour | null>(null)
   const [numerology, setNumerology] = useState({ personalYear: 0, personalMonth: 0, personalDay: 0, personalHour: 0 })
   const [activeAlignments, setActiveAlignments] = useState<Alignment[]>([])
@@ -78,95 +94,125 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
   const [sunTimes, setSunTimes] = useState<{ sunrise: Date; sunset: Date } | null>(null)
   const [expandedAlignment, setExpandedAlignment] = useState<string | null>(null)
   const [countdown, setCountdown] = useState('')
-  const dataRef = useRef<{ nextAlignment: typeof nextAlignment; activeAlignments: Alignment[]; currentPH: PlanetaryHour | null }>({
-    nextAlignment: null,
-    activeAlignments: [],
-    currentPH: null,
-  })
 
-  // Parse birth date — ensure numeric values
+  const dataRef = useRef<{
+    nextAlignment: typeof nextAlignment
+    activeAlignments: Alignment[]
+    currentPH: PlanetaryHour | null
+  }>({ nextAlignment: null, activeAlignments: [], currentPH: null })
+
   const birthParts = profile.date_of_birth.split('-')
   const birthMonth = parseInt(birthParts[1], 10)
   const birthDay = parseInt(birthParts[2], 10)
+  const lat = typeof profile.latitude === 'string' ? parseFloat(profile.latitude as string) : profile.latitude
+  const lon = typeof profile.longitude === 'string' ? parseFloat(profile.longitude as string) : profile.longitude
 
-  // Ensure lat/lon are numbers
-  const lat = typeof profile.latitude === 'string' ? parseFloat(profile.latitude) : profile.latitude
-  const lon = typeof profile.longitude === 'string' ? parseFloat(profile.longitude) : profile.longitude
+  // Initialize selected date
+  useEffect(() => {
+    const today = new Date()
+    const yyyy = today.getFullYear()
+    const mm = String(today.getMonth() + 1).padStart(2, '0')
+    const dd = String(today.getDate()).padStart(2, '0')
+    setSelectedDate(`${yyyy}-${mm}-${dd}`)
+  }, [])
 
   const compute = useCallback(() => {
     const currentTime = new Date()
     setNow(currentTime)
 
-    // Planetary hours
-    const hours = calculatePlanetaryHours(currentTime, lat, lon)
+    // Determine which date to compute for
+    const viewDate = isViewingToday ? currentTime : new Date(selectedDate + 'T12:00:00')
 
-    // Find current planetary hour by direct comparison
-    const nowMs = currentTime.getTime()
-    const current = hours.find(h => nowMs >= h.start.getTime() && nowMs < h.end.getTime()) || null
+    // Planetary hours for the viewed date
+    const hours = calculatePlanetaryHoursForDate(viewDate, lat, lon)
+
+    // Current planetary hour (always based on NOW, for the live indicator)
+    const current = findCurrentPlanetaryHour(currentTime, lat, lon)
     setCurrentPH(current)
+    dataRef.current.currentPH = current
 
-    // Sun times
-    const st = getSunTimes(currentTime, lat, lon)
+    // Sun times for viewed date
+    const st = getSunTimes(viewDate, lat, lon)
     setSunTimes(st)
 
-    // Numerology
+    // Numerology for current time
     const numProfile = calculateNumerology(birthMonth, birthDay, currentTime)
     setNumerology(numProfile)
 
-    // Active alignments for current hour
-    if (current) {
-      const aligns = findAlignments(current.planet, numProfile.personalHour)
+    // Numerology for the viewed date
+    const viewYear = viewDate.getFullYear()
+    const viewMonth = viewDate.getMonth() + 1
+    const viewDay = viewDate.getDate()
+    const pYear = personalYear(birthMonth, birthDay, viewYear)
+    const pMonth = calcPersonalMonth(pYear, viewMonth)
+
+    // Active alignments for current hour (live)
+    if (current && isViewingToday) {
+      const aligns = findAlignments(current.planet, numProfile.personalHour, numProfile.personalDay, numProfile.personalMonth)
       setActiveAlignments(aligns)
       dataRef.current.activeAlignments = aligns
     } else {
       setActiveAlignments([])
       dataRef.current.activeAlignments = []
     }
-    dataRef.current.currentPH = current
 
-    // Build timeline
-    const personalHoursAll = calculateAllPersonalHours(birthMonth, birthDay, currentTime)
+    // Build timeline for viewed date
+    const personalHoursAll = calculateAllPersonalHours(birthMonth, birthDay, viewDate)
     const entries: TimelineEntry[] = hours.map((ph) => {
       const clockHour = ph.start.getHours()
       const mins = ph.start.getMinutes()
-      // Format as AM/PM
       const period = clockHour >= 12 ? 'PM' : 'AM'
       const displayHour = clockHour === 0 ? 12 : clockHour > 12 ? clockHour - 12 : clockHour
       const label = `${displayHour}:${mins.toString().padStart(2, '0')} ${period}`
       const pHour = personalHoursAll[clockHour] ?? 0
-      const aligns = findAlignments(ph.planet, pHour)
+      const aligns = findAlignments(ph.planet, pHour, pMonth, pMonth)
+
+      // For the viewed date, use the correct personal day
+      const { personalDay: pDayForDate } = calculateNumerology(birthMonth, birthDay, new Date(viewDate.getFullYear(), viewDate.getMonth(), viewDate.getDate(), clockHour))
+      const alignsCorrect = findAlignments(ph.planet, pHour, pDayForDate, pMonth)
+
+      const bestTier = alignsCorrect.length > 0
+        ? (alignsCorrect.some(a => a.tier === 'super-supreme') ? 'super-supreme' as const
+          : alignsCorrect.some(a => a.tier === 'supreme') ? 'supreme' as const
+          : 'standard' as const)
+        : null
+
       return {
         planetaryHour: ph,
         personalHour: pHour,
-        alignments: aligns,
+        alignments: alignsCorrect,
         clockHourLabel: label,
+        bestTier,
       }
     })
     setTimeline(entries)
 
-    // Find next alignment — look for future entries with alignments
-    const futureWithAlignments = entries.filter(
-      (e) => e.alignments.length > 0 && e.planetaryHour.end.getTime() > nowMs
-    )
-
-    if (futureWithAlignments.length > 0) {
-      // Separate: currently active alignment vs upcoming
-      const currentlyActive = futureWithAlignments.find(
-        (e) => nowMs >= e.planetaryHour.start.getTime() && nowMs < e.planetaryHour.end.getTime()
-      )
-      const upcoming = futureWithAlignments.find(
-        (e) => e.planetaryHour.start.getTime() > nowMs
+    // Find next alignment (only relevant when viewing today)
+    if (isViewingToday) {
+      const nowMs = currentTime.getTime()
+      const futureWithAlignments = entries.filter(
+        (e) => e.alignments.length > 0 && e.planetaryHour.end.getTime() > nowMs
       )
 
-      if (currentlyActive) {
-        // We're inside an alignment now — show time remaining
-        const timeUntil = 0 // means "active now"
-        setNextAlignment({ entry: currentlyActive, timeUntil })
-        dataRef.current.nextAlignment = { entry: currentlyActive, timeUntil }
-      } else if (upcoming) {
-        const timeUntil = upcoming.planetaryHour.start.getTime() - nowMs
-        setNextAlignment({ entry: upcoming, timeUntil })
-        dataRef.current.nextAlignment = { entry: upcoming, timeUntil }
+      if (futureWithAlignments.length > 0) {
+        const currentlyActive = futureWithAlignments.find(
+          (e) => nowMs >= e.planetaryHour.start.getTime() && nowMs < e.planetaryHour.end.getTime()
+        )
+        const upcoming = futureWithAlignments.find(
+          (e) => e.planetaryHour.start.getTime() > nowMs
+        )
+
+        if (currentlyActive && activeAlignments.length > 0) {
+          setNextAlignment({ entry: currentlyActive, timeUntil: 0 })
+          dataRef.current.nextAlignment = { entry: currentlyActive, timeUntil: 0 }
+        } else if (upcoming) {
+          const timeUntil = upcoming.planetaryHour.start.getTime() - nowMs
+          setNextAlignment({ entry: upcoming, timeUntil })
+          dataRef.current.nextAlignment = { entry: upcoming, timeUntil }
+        } else {
+          setNextAlignment(null)
+          dataRef.current.nextAlignment = null
+        }
       } else {
         setNextAlignment(null)
         dataRef.current.nextAlignment = null
@@ -175,27 +221,26 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
       setNextAlignment(null)
       dataRef.current.nextAlignment = null
     }
-  }, [lat, lon, birthMonth, birthDay])
+  }, [lat, lon, birthMonth, birthDay, selectedDate, isViewingToday, activeAlignments.length])
 
   useEffect(() => {
+    if (!selectedDate) return
     compute()
     const interval = setInterval(compute, 30000)
     return () => clearInterval(interval)
-  }, [compute])
+  }, [compute, selectedDate])
 
-  // Countdown timer — updates every second using refs to avoid stale closures
+  // Countdown timer
   useEffect(() => {
     const tick = () => {
       const ref = dataRef.current
       if (ref.activeAlignments.length > 0 && ref.currentPH) {
-        // Active alignment — count down to window closing
         const diff = Math.max(0, ref.currentPH.end.getTime() - Date.now())
         const h = Math.floor(diff / 3600000)
         const m = Math.floor((diff % 3600000) / 60000)
         const s = Math.floor((diff % 60000) / 1000)
         setCountdown(`${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`)
       } else if (ref.nextAlignment && ref.nextAlignment.timeUntil > 0) {
-        // Upcoming alignment — count down to start
         const diff = Math.max(0, ref.nextAlignment.entry.planetaryHour.start.getTime() - Date.now())
         const h = Math.floor(diff / 3600000)
         const m = Math.floor((diff % 3600000) / 60000)
@@ -215,6 +260,34 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
 
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
+  const handleDateChange = (dateStr: string) => {
+    setSelectedDate(dateStr)
+    const today = new Date()
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    setIsViewingToday(dateStr === todayStr)
+    setExpandedAlignment(null)
+  }
+
+  const goToToday = () => {
+    const today = new Date()
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    handleDateChange(todayStr)
+  }
+
+  const viewDate = isViewingToday ? now : new Date(selectedDate + 'T12:00:00')
+
+  // Count supreme/super-supreme for the day
+  const supremeCount = timeline.filter(e => e.bestTier === 'supreme').length
+  const superSupremeCount = timeline.filter(e => e.bestTier === 'super-supreme').length
+  const standardCount = timeline.filter(e => e.alignments.length > 0 && e.bestTier === 'standard').length
+
+  // Helper to check if a timeline entry is the current hour
+  const isCurrentHour = (entry: TimelineEntry) => {
+    if (!isViewingToday || !currentPH) return false
+    const nowMs = now.getTime()
+    return nowMs >= entry.planetaryHour.start.getTime() && nowMs < entry.planetaryHour.end.getTime()
+  }
+
   return (
     <div className="min-h-screen p-4 md:p-6 max-w-[1600px] mx-auto">
       {/* Top Bar */}
@@ -224,7 +297,7 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
             SUPREME ALIGNMENT
           </h1>
           <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-            {dayNames[now.getDay()]} • {now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} • {profile.city}
+            {dayNames[viewDate.getDay()]} • {viewDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} • {profile.city}
           </p>
         </div>
         <div className="text-right">
@@ -233,27 +306,90 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
         </div>
       </div>
 
-      {/* Status Banner */}
-      {activeAlignments.length > 0 && (
-        <div className="alignment-active mb-6 rounded-lg p-4" style={{
-          background: `linear-gradient(135deg, ${activeAlignments[0].color}15, ${activeAlignments[0].color}05)`,
-          border: `1px solid ${activeAlignments[0].color}40`,
-        }}>
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-2xl">{activeAlignments[0].icon}</span>
-            <div>
-              <p className="text-sm font-bold uppercase tracking-wider" style={{ color: activeAlignments[0].color }}>
-                {activeAlignments[0].label} — ACTIVE NOW
-              </p>
-              <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-                Window closes in {countdown}
-              </p>
-            </div>
+      {/* Date Picker */}
+      <div className="terminal-card p-4 mb-6">
+        <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex items-center gap-2">
+            <label className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
+              View Date:
+            </label>
+            <input
+              type="date"
+              value={selectedDate}
+              onChange={(e) => handleDateChange(e.target.value)}
+              min={`${new Date().getFullYear()}-01-01`}
+              max={`${new Date().getFullYear()}-12-31`}
+              className="text-sm"
+              style={{ padding: '6px 10px' }}
+            />
           </div>
+          {!isViewingToday && (
+            <button
+              onClick={goToToday}
+              className="px-3 py-1.5 rounded text-xs font-semibold uppercase"
+              style={{ background: 'var(--accent-cyan)', color: 'var(--bg-primary)' }}
+            >
+              Back to Today
+            </button>
+          )}
+          {!isViewingToday && (
+            <span className="text-xs px-2 py-1 rounded" style={{ background: 'rgba(245,158,11,0.15)', color: 'var(--accent-amber)', border: '1px solid rgba(245,158,11,0.3)' }}>
+              Viewing {viewDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
+          )}
+
+          {/* Day summary badges */}
+          <div className="flex items-center gap-2 ml-auto">
+            {superSupremeCount > 0 && (
+              <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(255,107,43,0.15)', color: '#FF6B2B', border: '1px solid rgba(255,107,43,0.3)' }}>
+                👑 {superSupremeCount} Super Supreme
+              </span>
+            )}
+            {supremeCount > 0 && (
+              <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(255,215,0,0.15)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.3)' }}>
+                ⚜️ {supremeCount} Supreme
+              </span>
+            )}
+            {standardCount > 0 && (
+              <span className="text-[10px] px-2 py-1 rounded" style={{ background: 'rgba(6,182,212,0.1)', color: 'var(--accent-cyan)', border: '1px solid rgba(6,182,212,0.2)' }}>
+                {standardCount} Standard
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Active Alignment Banner (only when viewing today) */}
+      {isViewingToday && activeAlignments.length > 0 && (
+        <div className="alignment-active mb-6 rounded-lg p-4" style={{
+          background: activeAlignments.some(a => a.tier === 'super-supreme')
+            ? 'linear-gradient(135deg, rgba(255,107,43,0.15), rgba(255,107,43,0.03))'
+            : activeAlignments.some(a => a.tier === 'supreme')
+              ? 'linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.03))'
+              : `linear-gradient(135deg, ${activeAlignments[0].color}15, ${activeAlignments[0].color}05)`,
+          border: activeAlignments.some(a => a.tier === 'super-supreme')
+            ? '1px solid rgba(255,107,43,0.4)'
+            : activeAlignments.some(a => a.tier === 'supreme')
+              ? '1px solid rgba(255,215,0,0.4)'
+              : `1px solid ${activeAlignments[0].color}40`,
+        }}>
           {activeAlignments.map((a, i) => (
-            <p key={i} className="text-sm mt-1" style={{ color: 'var(--text-primary)' }}>
-              {a.suggestion}
-            </p>
+            <div key={i} className={i > 0 ? 'mt-3' : ''}>
+              <div className="flex items-center gap-3 mb-1">
+                <span className="text-2xl">{a.icon}</span>
+                <div>
+                  <p className="text-sm font-bold uppercase tracking-wider" style={{
+                    color: a.tier === 'super-supreme' ? '#FF6B2B' : a.tier === 'supreme' ? '#FFD700' : a.color
+                  }}>
+                    {a.label} — ACTIVE NOW
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                    Window closes in {countdown}
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm mt-1" style={{ color: 'var(--text-primary)' }}>{a.suggestion}</p>
+            </div>
           ))}
         </div>
       )}
@@ -263,7 +399,7 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
         {/* Current Planetary Hour */}
         <div className="terminal-card p-5">
           <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-secondary)' }}>
-            Planetary Hour
+            Current Planetary Hour
           </p>
           {currentPH ? (
             <>
@@ -285,19 +421,14 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
               </p>
             </>
           ) : (
-            <div>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Calculating...</p>
-              <p className="text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
-                Lat: {lat}, Lon: {lon}
-              </p>
-            </div>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Loading...</p>
           )}
         </div>
 
         {/* Personal Numerology */}
         <div className="terminal-card p-5">
           <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-secondary)' }}>
-            Personal Numbers
+            Personal Numbers {!isViewingToday && '(Today)'}
           </p>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -328,15 +459,11 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
             <div className="space-y-3">
               <div>
                 <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Sunrise</p>
-                <p className="text-lg font-bold" style={{ color: 'var(--accent-amber)' }}>
-                  ☀ {formatTime(sunTimes.sunrise)}
-                </p>
+                <p className="text-lg font-bold" style={{ color: 'var(--accent-amber)' }}>☀ {formatTime(sunTimes.sunrise)}</p>
               </div>
               <div>
                 <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Sunset</p>
-                <p className="text-lg font-bold" style={{ color: 'var(--accent-pink)' }}>
-                  ☾ {formatTime(sunTimes.sunset)}
-                </p>
+                <p className="text-lg font-bold" style={{ color: 'var(--accent-pink)' }}>☾ {formatTime(sunTimes.sunset)}</p>
               </div>
               <div>
                 <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>Coords</p>
@@ -351,28 +478,60 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
         {/* Next Alignment Countdown */}
         <div className="terminal-card p-5">
           <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-secondary)' }}>
-            {activeAlignments.length > 0 ? 'Current Window Closes' : 'Next Alignment'}
+            {!isViewingToday ? 'Day Summary' : activeAlignments.length > 0 ? 'Window Closes In' : 'Next Alignment'}
           </p>
-          <p className="text-3xl font-bold tracking-wider mb-2" style={{
-            color: activeAlignments.length > 0 ? 'var(--accent-green)' : nextAlignment ? 'var(--accent-cyan)' : 'var(--text-secondary)',
-            fontVariantNumeric: 'tabular-nums',
-          }}>
-            {countdown}
-          </p>
-          {activeAlignments.length > 0 ? (
-            <p className="text-xs" style={{ color: 'var(--accent-green)' }}>
-              {activeAlignments.map(a => a.icon).join(' ')} ALIGNMENT ACTIVE
-            </p>
-          ) : nextAlignment ? (
-            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-              {nextAlignment.entry.alignments.map(a => a.icon).join(' ')}{' '}
-              {nextAlignment.entry.alignments.map(a => a.label).join(', ')}
-            </p>
+          {!isViewingToday ? (
+            <div className="space-y-2">
+              <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
+                {timeline.filter(e => e.alignments.length > 0).length} alignment windows
+              </p>
+              {superSupremeCount > 0 && <p className="text-xs" style={{ color: '#FF6B2B' }}>👑 {superSupremeCount} Super Supreme</p>}
+              {supremeCount > 0 && <p className="text-xs" style={{ color: '#FFD700' }}>⚜️ {supremeCount} Supreme</p>}
+              {standardCount > 0 && <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{standardCount} Standard</p>}
+            </div>
           ) : (
-            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
-              No more alignments today
-            </p>
+            <>
+              <p className="text-3xl font-bold tracking-wider mb-2" style={{
+                color: activeAlignments.length > 0 ? 'var(--accent-green)' : nextAlignment ? 'var(--accent-cyan)' : 'var(--text-secondary)',
+                fontVariantNumeric: 'tabular-nums',
+              }}>
+                {countdown}
+              </p>
+              {activeAlignments.length > 0 ? (
+                <p className="text-xs" style={{ color: 'var(--accent-green)' }}>
+                  {activeAlignments.map(a => a.icon).join(' ')} ACTIVE
+                </p>
+              ) : nextAlignment ? (
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  {nextAlignment.entry.alignments.map(a => a.icon).join(' ')}{' '}
+                  {nextAlignment.entry.alignments[0]?.label}
+                </p>
+              ) : (
+                <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
+                  No more alignments today
+                </p>
+              )}
+            </>
           )}
+        </div>
+      </div>
+
+      {/* Tier Legend */}
+      <div className="terminal-card p-4 mb-6">
+        <div className="flex items-center gap-6 flex-wrap">
+          <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Tier System:</p>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--accent-cyan)' }} />
+            <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Standard — Planet + Hour aligned</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm" style={{ background: '#FFD700' }} />
+            <span className="text-xs" style={{ color: '#FFD700' }}>⚜️ Supreme — Planet + Hour + Day energy aligned</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm" style={{ background: '#FF6B2B' }} />
+            <span className="text-xs" style={{ color: '#FF6B2B' }}>👑 Super Supreme — Planet + Hour + Day + Month energy aligned</span>
+          </div>
         </div>
       </div>
 
@@ -384,10 +543,11 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
 
         <div className="flex gap-[2px] items-end mb-2" style={{ height: '120px' }}>
           {timeline.map((entry, idx) => {
-            const isActive = currentPH && entry.planetaryHour.hourIndex === currentPH.hourIndex
+            const isCurrent = isCurrentHour(entry)
             const hasAlignment = entry.alignments.length > 0
-            const barHeight = hasAlignment ? '100%' : '40%'
+            const barHeight = hasAlignment ? (entry.bestTier === 'super-supreme' ? '100%' : entry.bestTier === 'supreme' ? '85%' : '70%') : '35%'
             const planet = entry.planetaryHour.planet
+            const tierColor = entry.bestTier ? TIER_COLORS[entry.bestTier] : ''
 
             return (
               <div
@@ -396,22 +556,24 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
                 style={{
                   height: barHeight,
                   background: hasAlignment
-                    ? `linear-gradient(to top, ${PLANET_COLORS[planet]}40, ${entry.alignments[0].color}80)`
-                    : `${PLANET_COLORS[planet]}30`,
-                  border: isActive ? `2px solid ${PLANET_COLORS[planet]}` : 'none',
-                  boxShadow: isActive ? `0 0 10px ${PLANET_COLORS[planet]}40` : 'none',
-                }}
-                onClick={() => {
-                  if (hasAlignment) {
-                    setExpandedAlignment(
-                      expandedAlignment === `${idx}` ? null : `${idx}`
-                    )
-                  }
+                    ? tierColor
+                      ? `linear-gradient(to top, ${PLANET_COLORS[planet]}40, ${tierColor}90)`
+                      : `linear-gradient(to top, ${PLANET_COLORS[planet]}40, ${entry.alignments[0].color}80)`
+                    : `${PLANET_COLORS[planet]}25`,
+                  border: isCurrent ? '2px solid #fff' : 'none',
+                  boxShadow: isCurrent ? '0 0 12px rgba(255,255,255,0.4)' : hasAlignment && tierColor ? `0 0 8px ${tierColor}30` : 'none',
                 }}
               >
+                {/* Current time marker */}
+                {isCurrent && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <div className="w-0 h-0" style={{ borderLeft: '5px solid transparent', borderRight: '5px solid transparent', borderTop: '5px solid #fff' }} />
+                  </div>
+                )}
+
                 {/* Tooltip */}
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 pointer-events-none">
-                  <div className="terminal-card p-3 min-w-[200px] text-xs">
+                  <div className="terminal-card p-3 min-w-[220px] text-xs">
                     <p className="font-bold" style={{ color: PLANET_COLORS[planet] }}>
                       {PLANET_SYMBOLS[planet]} {planet} Hour
                     </p>
@@ -419,10 +581,11 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
                       {formatTime(entry.planetaryHour.start)} — {formatTime(entry.planetaryHour.end)}
                     </p>
                     <p className="mt-1">Personal Hour: <span style={{ color: 'var(--accent-cyan)' }}>{entry.personalHour}</span></p>
+                    {isCurrent && <p className="mt-1 font-bold" style={{ color: '#fff' }}>◉ YOU ARE HERE</p>}
                     {hasAlignment && (
                       <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
                         {entry.alignments.map((a, i) => (
-                          <p key={i} style={{ color: a.color }}>
+                          <p key={i} style={{ color: a.tier === 'super-supreme' ? '#FF6B2B' : a.tier === 'supreme' ? '#FFD700' : a.color }}>
                             {a.icon} {a.label}
                           </p>
                         ))}
@@ -431,10 +594,11 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
                   </div>
                 </div>
 
+                {/* Tier indicator dot */}
                 {hasAlignment && (
                   <div
                     className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full"
-                    style={{ background: entry.alignments[0].color }}
+                    style={{ background: tierColor || entry.alignments[0].color }}
                   />
                 )}
               </div>
@@ -444,17 +608,23 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
 
         {/* Time labels */}
         <div className="flex gap-[2px]">
-          {timeline.map((entry, idx) => (
-            <div key={idx} className="flex-1 text-center">
-              <p className="text-[8px] md:text-[10px]" style={{ color: 'var(--text-secondary)' }}>
-                {entry.clockHourLabel.replace(' AM', 'a').replace(' PM', 'p')}
-              </p>
-            </div>
-          ))}
+          {timeline.map((entry, idx) => {
+            const isCurrent = isCurrentHour(entry)
+            return (
+              <div key={idx} className="flex-1 text-center">
+                <p className="text-[8px] md:text-[10px]" style={{
+                  color: isCurrent ? '#fff' : 'var(--text-secondary)',
+                  fontWeight: isCurrent ? 'bold' : 'normal',
+                }}>
+                  {entry.clockHourLabel.replace(' AM', 'a').replace(' PM', 'p')}
+                </p>
+              </div>
+            )
+          })}
         </div>
       </div>
 
-      {/* Detailed Hour Table */}
+      {/* Hour-by-Hour Table */}
       <div className="terminal-card p-5">
         <p className="text-xs uppercase tracking-wider mb-4" style={{ color: 'var(--text-secondary)' }}>
           Hour-by-Hour Breakdown
@@ -473,7 +643,7 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
             </thead>
             <tbody>
               {timeline.map((entry, idx) => {
-                const isActive = currentPH && entry.planetaryHour.hourIndex === currentPH.hourIndex
+                const isCurrent = isCurrentHour(entry)
                 const planet = entry.planetaryHour.planet
                 const isExpanded = expandedAlignment === `table-${idx}`
 
@@ -488,11 +658,20 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
                     }}
                     style={{
                       borderBottom: '1px solid var(--border-color)',
-                      background: isActive ? 'rgba(6, 182, 212, 0.05)' : 'transparent',
+                      background: isCurrent
+                        ? 'rgba(255, 255, 255, 0.06)'
+                        : entry.bestTier === 'super-supreme'
+                          ? 'rgba(255, 107, 43, 0.04)'
+                          : entry.bestTier === 'supreme'
+                            ? 'rgba(255, 215, 0, 0.04)'
+                            : 'transparent',
                     }}
                   >
-                    <td className="py-2 px-2 font-mono" style={{ color: isActive ? 'var(--accent-cyan)' : 'var(--text-secondary)' }}>
-                      {isActive && '▸ '}{entry.clockHourLabel}
+                    <td className="py-2 px-2 font-mono" style={{
+                      color: isCurrent ? '#fff' : 'var(--text-secondary)',
+                      fontWeight: isCurrent ? 'bold' : 'normal',
+                    }}>
+                      {isCurrent && '▸ '}{entry.clockHourLabel}
                     </td>
                     <td className="py-2 px-2">
                       <span style={{ color: PLANET_COLORS[planet] }}>
@@ -514,35 +693,40 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
                                 key={i}
                                 className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase"
                                 style={{
-                                  background: `${a.color}20`,
-                                  color: a.color,
-                                  border: `1px solid ${a.color}40`,
+                                  background: a.tier === 'super-supreme'
+                                    ? 'rgba(255,107,43,0.2)'
+                                    : a.tier === 'supreme'
+                                      ? 'rgba(255,215,0,0.2)'
+                                      : `${a.color}20`,
+                                  color: a.tier === 'super-supreme'
+                                    ? '#FF6B2B'
+                                    : a.tier === 'supreme'
+                                      ? '#FFD700'
+                                      : a.color,
+                                  border: `1px solid ${a.tier === 'super-supreme' ? 'rgba(255,107,43,0.4)' : a.tier === 'supreme' ? 'rgba(255,215,0,0.4)' : a.color + '40'}`,
                                 }}
                               >
                                 {a.icon} {a.label} {isExpanded ? '▾' : '▸'}
                               </span>
                             ))}
                           </div>
-                          {/* Expanded detail */}
                           {isExpanded && (
                             <div className="mt-3 space-y-3">
                               {entry.alignments.map((a, i) => {
                                 const detail = ALIGNMENT_DETAILS[a.theme]
                                 if (!detail) return null
                                 return (
-                                  <div
-                                    key={i}
-                                    className="p-3 rounded-lg"
-                                    style={{
-                                      background: `${a.color}08`,
-                                      border: `1px solid ${a.color}25`,
-                                    }}
-                                  >
-                                    <p className="text-xs font-bold mb-1" style={{ color: a.color }}>
+                                  <div key={i} className="p-3 rounded-lg" style={{
+                                    background: a.tier === 'super-supreme' ? 'rgba(255,107,43,0.06)' : a.tier === 'supreme' ? 'rgba(255,215,0,0.06)' : `${a.color}08`,
+                                    border: `1px solid ${a.tier === 'super-supreme' ? 'rgba(255,107,43,0.2)' : a.tier === 'supreme' ? 'rgba(255,215,0,0.2)' : a.color + '25'}`,
+                                  }}>
+                                    <p className="text-xs font-bold mb-1" style={{
+                                      color: a.tier === 'super-supreme' ? '#FF6B2B' : a.tier === 'supreme' ? '#FFD700' : a.color
+                                    }}>
                                       {a.icon} {a.label}
                                     </p>
                                     <p className="text-[11px] mb-2 leading-relaxed" style={{ color: 'var(--text-primary)' }}>
-                                      {detail.description}
+                                      {a.suggestion}
                                     </p>
                                     <p className="text-[10px] uppercase tracking-wider mb-1" style={{ color: 'var(--text-secondary)' }}>
                                       Suggested Actions:
@@ -550,7 +734,7 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
                                     <ul className="space-y-1">
                                       {detail.examples.map((ex, j) => (
                                         <li key={j} className="text-[11px] flex items-start gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                                          <span style={{ color: a.color }}>›</span> {ex}
+                                          <span style={{ color: a.tier === 'super-supreme' ? '#FF6B2B' : a.tier === 'supreme' ? '#FFD700' : a.color }}>›</span> {ex}
                                         </li>
                                       ))}
                                     </ul>
@@ -578,7 +762,7 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
       {/* Alignment Legend */}
       <div className="terminal-card p-5 mt-6">
         <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-secondary)' }}>
-          Alignment Legend
+          Alignment Reference
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {[

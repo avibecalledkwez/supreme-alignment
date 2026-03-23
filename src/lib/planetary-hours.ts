@@ -46,25 +46,25 @@ export interface PlanetaryHour {
 
 function getChaldeanPlanet(dayRuler: Planet, hourOffset: number): Planet {
   const startIndex = CHALDEAN_SEQUENCE.indexOf(dayRuler)
-  // Move backwards through the sequence (Chaldean order goes Saturn->Jupiter->Mars->Sun->Venus->Mercury->Moon)
-  // Each subsequent hour goes to the next planet in the sequence
   const index = (startIndex + hourOffset) % 7
   return CHALDEAN_SEQUENCE[index]
 }
 
-export function calculatePlanetaryHours(
-  date: Date,
+/**
+ * Calculate 24 planetary hours for a given calendar date.
+ * Hours span from that date's sunrise to the next date's sunrise.
+ */
+export function calculatePlanetaryHoursForDate(
+  calendarDate: Date,
   latitude: number,
   longitude: number
 ): PlanetaryHour[] {
   const hours: PlanetaryHour[] = []
 
-  // Get sun times for today
-  const today = new Date(date.getFullYear(), date.getMonth(), date.getDate())
-  const todayTimes = SunCalc.getTimes(today, latitude, longitude)
+  const day = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), calendarDate.getDate(), 12, 0, 0)
+  const todayTimes = SunCalc.getTimes(day, latitude, longitude)
 
-  // Get sun times for tomorrow (for nighttime calculation)
-  const tomorrow = new Date(today)
+  const tomorrow = new Date(day)
   tomorrow.setDate(tomorrow.getDate() + 1)
   const tomorrowTimes = SunCalc.getTimes(tomorrow, latitude, longitude)
 
@@ -72,17 +72,14 @@ export function calculatePlanetaryHours(
   const sunset = todayTimes.sunset
   const nextSunrise = tomorrowTimes.sunrise
 
-  // Calculate hour lengths
   const dayLengthMs = sunset.getTime() - sunrise.getTime()
   const nightLengthMs = nextSunrise.getTime() - sunset.getTime()
   const dayHourMs = dayLengthMs / 12
   const nightHourMs = nightLengthMs / 12
 
-  // Get the day ruler
-  const dayOfWeek = today.getDay()
+  const dayOfWeek = calendarDate.getDay()
   const dayRuler = DAY_RULERS[dayOfWeek]
 
-  // Generate 24 planetary hours (12 day + 12 night)
   for (let i = 0; i < 24; i++) {
     const isDay = i < 12
     const hourMs = isDay ? dayHourMs : nightHourMs
@@ -93,25 +90,55 @@ export function calculatePlanetaryHours(
     const end = new Date(start.getTime() + hourMs)
     const planet = getChaldeanPlanet(dayRuler, i)
 
-    hours.push({
-      planet,
-      start,
-      end,
-      isDay,
-      hourIndex: i,
-    })
+    hours.push({ planet, start, end, isDay, hourIndex: i })
   }
 
   return hours
 }
 
-export function getCurrentPlanetaryHour(hours: PlanetaryHour[]): PlanetaryHour | null {
-  const now = new Date()
-  return hours.find(h => now >= h.start && now < h.end) || null
+/**
+ * Calculate planetary hours for the current moment.
+ * If before today's sunrise, we're in yesterday's nighttime hours.
+ * Returns { hours, currentHour } where hours is for display (today's full day)
+ * and currentHour is the actual current planetary hour (could be from yesterday).
+ */
+export function calculatePlanetaryHours(
+  date: Date,
+  latitude: number,
+  longitude: number
+): PlanetaryHour[] {
+  return calculatePlanetaryHoursForDate(date, latitude, longitude)
+}
+
+/**
+ * Find which planetary hour the given time falls in.
+ * Checks today's hours first, then yesterday's nighttime hours.
+ */
+export function findCurrentPlanetaryHour(
+  now: Date,
+  latitude: number,
+  longitude: number
+): PlanetaryHour | null {
+  const nowMs = now.getTime()
+
+  // Try today's planetary hours
+  const todayHours = calculatePlanetaryHoursForDate(now, latitude, longitude)
+  const inToday = todayHours.find(h => nowMs >= h.start.getTime() && nowMs < h.end.getTime())
+  if (inToday) return inToday
+
+  // If not found, we might be before today's sunrise — check yesterday's nighttime hours
+  const yesterday = new Date(now)
+  yesterday.setDate(yesterday.getDate() - 1)
+  const yesterdayHours = calculatePlanetaryHoursForDate(yesterday, latitude, longitude)
+  const inYesterday = yesterdayHours.find(h => nowMs >= h.start.getTime() && nowMs < h.end.getTime())
+  if (inYesterday) return inYesterday
+
+  return null
 }
 
 export function getSunTimes(date: Date, latitude: number, longitude: number) {
-  const times = SunCalc.getTimes(date, latitude, longitude)
+  const day = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0)
+  const times = SunCalc.getTimes(day, latitude, longitude)
   return {
     sunrise: times.sunrise,
     sunset: times.sunset,
