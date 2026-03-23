@@ -39,7 +39,7 @@ export default function SignupPage() {
       const geoRes = await fetch(`/api/geocode?q=${encodeURIComponent(city)}`)
       const geoData = await geoRes.json()
       if (geoData.error) {
-        setError('Could not find that location. Please try a different city or zip code.')
+        setError(geoData.error || 'Could not find that location. Try "Charlotte, NC" or "New York, NY".')
         setLoading(false)
         return
       }
@@ -142,7 +142,7 @@ export default function SignupPage() {
               onChange={(e) => setFirstName(e.target.value)}
               required
               className="w-full"
-              placeholder="Marquez"
+              placeholder="Name"
             />
           </div>
 
