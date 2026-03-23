@@ -59,6 +59,28 @@ export default async function DashboardPage() {
       {/* Settings link */}
       <div className="fixed top-4 right-4 z-50 flex gap-2">
         <Link
+          href="/learn"
+          className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider"
+          style={{
+            background: 'var(--bg-tertiary)',
+            color: 'var(--accent-cyan)',
+            border: '1px solid var(--border-color)',
+          }}
+        >
+          Learn
+        </Link>
+        <Link
+          href="/how-it-works"
+          className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider"
+          style={{
+            background: 'var(--bg-tertiary)',
+            color: 'var(--accent-purple)',
+            border: '1px solid var(--border-color)',
+          }}
+        >
+          How It Works
+        </Link>
+        <Link
           href="/settings"
           className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider"
           style={{
