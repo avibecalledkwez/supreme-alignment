@@ -47,6 +47,17 @@ const themes = [
     explanation:
       'Mercury and Sun hours open up channels of mental agility and creative confidence. Personal Hour 3 amplifies your expressive bandwidth \u2014 ideas flow, words come easily, art feels natural. Personal Hour 5 adds a restless curiosity and sense of adventure. Together, the planetary and personal cycles create a creative bandwidth where inspiration meets the confidence to act on it.',
   },
+  {
+    name: 'Spiritual & Intuition',
+    emoji: '\ud83d\udd2e',
+    color: '#6366F1',
+    planets: ['Saturn', 'Moon'],
+    planetWhy: 'Saturn governs karmic discipline, deep structure, and the lessons of time; the Moon rules intuition, the subconscious mind, and inner knowing.',
+    numbers: [7, 9],
+    numberWhy: 'Personal Hour 7 (spiritual wisdom, introspection, and analysis) or 9 (transcendence, completion, and higher purpose).',
+    explanation:
+      'Saturn hours create a container of stillness and seriousness \u2014 perfect for confronting deeper truths and doing inner work. Moon hours open the gates to your subconscious, heightening intuition and emotional sensitivity. When your Personal Hour hits 7, you enter a naturally reflective, wisdom-seeking state. At 9, you access a broader, more transcendent perspective. The combination creates a spiritual bandwidth where the veil between conscious and unconscious thins, and profound insight becomes accessible.',
+  },
 ]
 
 export default function HowItWorksPage() {
@@ -143,7 +154,7 @@ export default function HowItWorksPage() {
           </h2>
 
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>
-            Supreme Alignment tracks four life domains. Each theme pairs specific planetary energies with
+            Supreme Alignment tracks five life domains. Each theme pairs specific planetary energies with
             specific personal numbers &mdash; and there&apos;s a reason behind every combination.
           </p>
 
@@ -543,7 +554,7 @@ export default function HowItWorksPage() {
               {
                 title: 'Using Alignment Windows',
                 color: 'var(--accent-green)',
-                text: 'When you see an alignment activate on your dashboard, that is the optimal time to take action related to that theme. Schedule important meetings during Financial alignments, plan date nights during Love alignments, work out during Health alignments, and brainstorm during Creativity alignments. Even small actions taken during aligned hours carry more momentum.',
+                text: 'When you see an alignment activate on your dashboard, that is the optimal time to take action related to that theme. Schedule important meetings during Financial alignments, plan date nights during Love alignments, work out during Health alignments, brainstorm during Creativity alignments, and meditate or journal during Spiritual alignments. Even small actions taken during aligned hours carry more momentum.',
               },
               {
                 title: 'When No Alignments Are Active',

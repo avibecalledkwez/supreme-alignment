@@ -81,6 +81,17 @@ const ALIGNMENT_DETAILS: Record<string, { description: string; examples: string[
       'Pitch creative ideas to collaborators or clients',
     ],
   },
+  spiritual: {
+    description:
+      'This window occurs when Saturn (karmic discipline, deep structure) or the Moon (intuition, subconscious, inner knowing) governs the planetary hour while your personal cycle resonates at 7 (spiritual wisdom, introspection) or 9 (transcendence, completion, higher purpose). Your connection to the unseen is amplified.',
+    examples: [
+      'Meditate, pray, or practice breathwork and stillness',
+      'Journal for self-reflection, shadow work, or dream analysis',
+      'Pull tarot/oracle cards or consult divination tools',
+      'Study sacred texts, philosophy, or metaphysical subjects',
+      'Practice energy work, reiki, or sound healing',
+    ],
+  },
 }
 
 const TIER_COLORS: Record<AlignmentTier, string> = {
@@ -791,12 +802,13 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
         <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-secondary)' }}>
           Alignment Reference
         </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
           {[
             { icon: '💰', label: 'Financial & Power', desc: 'Jupiter/Venus + PH 3 or 8', color: '#10B981', theme: 'financial' },
             { icon: '💜', label: 'Love & Connection', desc: 'Venus/Moon + PH 2 or 6', color: '#EC4899', theme: 'love' },
             { icon: '⚡', label: 'Health & Wellness', desc: 'Sun/Mars + PH 1 or 4', color: '#F59E0B', theme: 'health' },
             { icon: '✨', label: 'Creativity & Fun', desc: 'Mercury/Sun + PH 3 or 5', color: '#8B5CF6', theme: 'creativity' },
+            { icon: '🔮', label: 'Spiritual & Intuition', desc: 'Saturn/Moon + PH 7 or 9', color: '#6366F1', theme: 'spiritual' },
           ].map((item, i) => (
             <div
               key={i}

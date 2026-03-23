@@ -1,6 +1,6 @@
 import { type Planet } from './planetary-hours'
 
-export type AlignmentTheme = 'financial' | 'love' | 'health' | 'creativity'
+export type AlignmentTheme = 'financial' | 'love' | 'health' | 'creativity' | 'spiritual'
 export type AlignmentTier = 'standard' | 'supreme' | 'super-supreme'
 
 export interface Alignment {
@@ -63,6 +63,16 @@ const ALIGNMENT_RULES: AlignmentRule[] = [
     color: '#8B5CF6',
     icon: '✨',
   },
+  {
+    theme: 'spiritual',
+    label: 'Spiritual & Intuition',
+    planets: ['Saturn', 'Moon'],
+    personalHours: [7, 9],
+    suggestion:
+      'Supreme Alignment: Optimal window for meditation, prayer, journaling, shadow work, or deepening your spiritual practice.',
+    color: '#6366F1',
+    icon: '🔮',
+  },
 ]
 
 const TIER_LABELS: Record<AlignmentTier, string> = {
@@ -77,18 +87,21 @@ const TIER_SUGGESTIONS: Record<AlignmentTier, Record<AlignmentTheme, string>> = 
     love: 'Optimal window for scheduling dates, resolving conflicts, or prioritizing social networking.',
     health: 'Optimal window to begin new workout routines, prioritize physical exertion, or schedule medical checkups.',
     creativity: 'Optimal window for brainstorming, content creation, or engaging in hobbies.',
+    spiritual: 'Optimal window for meditation, prayer, journaling, shadow work, or deepening your spiritual practice.',
   },
   'supreme': {
     financial: 'SUPREME: Your daily energy cycle AND planetary hour are locked in for wealth. Execute your highest-stakes financial moves NOW.',
     love: 'SUPREME: Your daily rhythm AND cosmic timing are perfectly synced for connection. Pursue meaningful relationships with full confidence.',
     health: 'SUPREME: Your body\'s daily vitality cycle AND planetary forces are aligned. Push your physical limits — recovery will be exceptional.',
     creativity: 'SUPREME: Your daily creative frequency AND planetary inspiration are in perfect harmony. Your most original ideas will surface now.',
+    spiritual: 'SUPREME: Your daily spiritual attunement AND planetary hour are perfectly aligned. Deep meditative states and intuitive breakthroughs are accessible now.',
   },
   'super-supreme': {
     financial: 'SUPER SUPREME: Month, day, hour, AND planetary energies are ALL synchronized for maximum financial power. This is the rarest window — act decisively on your biggest opportunities.',
     love: 'SUPER SUPREME: Your monthly, daily, hourly, AND planetary cycles are ALL resonating love frequencies. This is an extraordinarily rare moment of deep connection potential.',
     health: 'SUPER SUPREME: Every layer of your numerological cycle AND the planetary hour are unified for vitality. This is a once-in-a-rare window — commit to transformative health actions.',
     creativity: 'SUPER SUPREME: Your entire numerological stack AND cosmic timing are in total creative resonance. Channel this rare convergence into your most ambitious creative vision.',
+    spiritual: 'SUPER SUPREME: Month, day, hour, AND planetary energies are ALL unified in spiritual frequency. This is an extraordinarily rare portal — profound revelations, karmic clarity, and transcendent experiences are possible.',
   },
 }
 
