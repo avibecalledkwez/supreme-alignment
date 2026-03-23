@@ -55,45 +55,13 @@ export default async function DashboardPage() {
   }
 
   return (
-    <>
-      {/* Settings link */}
-      <div className="fixed top-4 right-4 z-50 flex gap-2">
-        <Link
-          href="/learn"
-          className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider"
-          style={{
-            background: 'var(--bg-tertiary)',
-            color: 'var(--accent-cyan)',
-            border: '1px solid var(--border-color)',
-          }}
-        >
-          Learn
-        </Link>
-        <Link
-          href="/how-it-works"
-          className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider"
-          style={{
-            background: 'var(--bg-tertiary)',
-            color: 'var(--accent-purple)',
-            border: '1px solid var(--border-color)',
-          }}
-        >
-          How It Works
-        </Link>
-        <Link
-          href="/settings"
-          className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider"
-          style={{
-            background: 'var(--bg-tertiary)',
-            color: 'var(--text-secondary)',
-            border: '1px solid var(--border-color)',
-          }}
-        >
-          ⚙ Settings
-        </Link>
-      </div>
-
-      <AlignmentDashboard profile={profile} />
-    </>
+    <AlignmentDashboard
+      profile={profile}
+      navLinks={[
+        { href: '/learn', label: 'Learn', color: 'var(--accent-cyan)' },
+        { href: '/how-it-works', label: 'How It Works', color: 'var(--accent-purple)' },
+        { href: '/settings', label: '⚙ Settings', color: 'var(--text-secondary)' },
+      ]}
+    />
   )
 }

@@ -11,6 +11,13 @@ import {
 } from '@/lib/planetary-hours'
 import { calculateNumerology, calculateAllPersonalHours, personalYear, personalMonth as calcPersonalMonth } from '@/lib/numerology'
 import { findAlignments, type Alignment, type AlignmentTier } from '@/lib/alignment-engine'
+import Link from 'next/link'
+
+interface NavLink {
+  href: string
+  label: string
+  color: string
+}
 
 interface UserProfile {
   first_name: string
@@ -82,7 +89,7 @@ const TIER_COLORS: Record<AlignmentTier, string> = {
   'super-supreme': '#FF6B2B',
 }
 
-export default function AlignmentDashboard({ profile }: { profile: UserProfile }) {
+export default function AlignmentDashboard({ profile, navLinks = [] }: { profile: UserProfile; navLinks?: NavLink[] }) {
   const [now, setNow] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [isViewingToday, setIsViewingToday] = useState(true)
@@ -291,7 +298,7 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
   return (
     <div className="min-h-screen p-4 md:p-6 max-w-[1600px] mx-auto">
       {/* Top Bar */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
         <div>
           <h1 className="text-xl font-bold tracking-tight" style={{ color: 'var(--accent-cyan)' }}>
             SUPREME ALIGNMENT
@@ -300,9 +307,29 @@ export default function AlignmentDashboard({ profile }: { profile: UserProfile }
             {dayNames[viewDate.getDay()]} • {viewDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} • {profile.city}
           </p>
         </div>
-        <div className="text-right">
-          <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Welcome back,</p>
-          <p className="text-lg font-bold">{profile.first_name}</p>
+        <div className="flex items-center gap-3">
+          {navLinks.length > 0 && (
+            <div className="flex gap-2">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider"
+                  style={{
+                    background: 'var(--bg-tertiary)',
+                    color: link.color,
+                    border: '1px solid var(--border-color)',
+                  }}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
+          <div className="text-right">
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Welcome back,</p>
+            <p className="text-lg font-bold">{profile.first_name}</p>
+          </div>
         </div>
       </div>
 
