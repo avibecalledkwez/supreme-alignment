@@ -139,7 +139,7 @@ export default function HowItWorksPage() {
         </p>
 
         {/* ============================================ */}
-        {/* SECTION 1: The Four Alignment Themes */}
+        {/* SECTION 1: The Five Alignment Themes */}
         {/* ============================================ */}
         <section className="terminal-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
           <h2
@@ -150,7 +150,7 @@ export default function HowItWorksPage() {
               marginBottom: '1rem',
             }}
           >
-            1. The Four Alignment Themes
+            1. The Five Alignment Themes
           </h2>
 
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>
@@ -446,7 +446,7 @@ export default function HowItWorksPage() {
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
                 Your monthly cycle, daily cycle, hourly cycle, AND the planetary hour are ALL vibrating at the
                 same frequency for this theme. Extraordinarily rare &mdash; when this happens, it&apos;s a
-                once-in-a-cycle convergence. Four independent timing mechanisms all pointing in the same
+                once-in-a-cycle convergence. All independent timing mechanisms pointing in the same
                 direction at the same moment. This is the highest tier of alignment the system can detect.
               </p>
             </div>
