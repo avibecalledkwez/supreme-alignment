@@ -5,7 +5,7 @@ import Link from 'next/link'
 const themes = [
   {
     name: 'Financial & Power',
-    emoji: '\ud83d\udcb0',
+    emoji: '💰',
     color: 'var(--accent-amber)',
     planets: ['Jupiter', 'Venus'],
     planetWhy: 'Jupiter governs expansion and abundance; Venus rules money, attraction, and material magnetism.',
@@ -16,7 +16,7 @@ const themes = [
   },
   {
     name: 'Love & Connection',
-    emoji: '\ud83d\udc9c',
+    emoji: '💜',
     color: 'var(--accent-pink)',
     planets: ['Venus', 'Moon'],
     planetWhy: 'Venus rules love, beauty, and harmony; the Moon governs emotion, intuition, and deep feeling.',
@@ -49,7 +49,7 @@ const themes = [
   },
   {
     name: 'Spiritual & Intuition',
-    emoji: '\ud83d\udd2e',
+    emoji: '🔮',
     color: '#6366F1',
     planets: ['Saturn', 'Moon'],
     planetWhy: 'Saturn governs karmic discipline, deep structure, and the lessons of time; the Moon rules intuition, the subconscious mind, and inner knowing.',
@@ -422,7 +422,7 @@ export default function HowItWorksPage() {
                   marginBottom: '0.5rem',
                 }}
               >
-                Super Supreme Alignment \ud83d\udc51
+                Super Supreme Alignment
               </h3>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
                 4 LAYERS OF SYNCHRONICITY
@@ -519,7 +519,7 @@ export default function HowItWorksPage() {
                 </tr>
                 <tr>
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--accent-amber)', fontWeight: 600 }}>
-                    Super Supreme \ud83d\udc51
+                    Super Supreme
                   </td>
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>4</td>
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
