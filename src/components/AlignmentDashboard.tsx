@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useSearchParams } from 'next/navigation'
 import {
   calculatePlanetaryHoursForDate,
   findCurrentPlanetaryHour,
@@ -102,6 +103,7 @@ const TIER_COLORS: Record<AlignmentTier, string> = {
 }
 
 export default function AlignmentDashboard({ profile, navLinks = [] }: { profile: UserProfile; navLinks?: NavLink[] }) {
+  const searchParams = useSearchParams()
   const [now, setNow] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [isViewingToday, setIsViewingToday] = useState(true)
@@ -126,14 +128,22 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
   const lat = typeof profile.latitude === 'string' ? parseFloat(profile.latitude as string) : profile.latitude
   const lon = typeof profile.longitude === 'string' ? parseFloat(profile.longitude as string) : profile.longitude
 
-  // Initialize selected date
+  // Initialize selected date — read from URL ?date= param if present (from calendar page)
   useEffect(() => {
     const today = new Date()
     const yyyy = today.getFullYear()
     const mm = String(today.getMonth() + 1).padStart(2, '0')
     const dd = String(today.getDate()).padStart(2, '0')
-    setSelectedDate(`${yyyy}-${mm}-${dd}`)
-  }, [])
+    const todayStr = `${yyyy}-${mm}-${dd}`
+
+    const urlDate = searchParams.get('date')
+    if (urlDate && /^\d{4}-\d{2}-\d{2}$/.test(urlDate)) {
+      setSelectedDate(urlDate)
+      setIsViewingToday(urlDate === todayStr)
+    } else {
+      setSelectedDate(todayStr)
+    }
+  }, [searchParams])
 
   const compute = useCallback(() => {
     const currentTime = new Date()

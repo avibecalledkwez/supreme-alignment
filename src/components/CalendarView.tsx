@@ -101,7 +101,7 @@ function computeDayAlignments(
 }
 
 function getDayCellColor(day: DayData): string {
-  if (day.superSupremeCount > 0) return 'rgba(249, 115, 22, 0.35)'
+  if (day.superSupremeCount > 0) return 'rgba(220, 50, 20, 0.45)'
   if (day.supremeCount > 0) return 'rgba(245, 158, 11, 0.3)'
   if (day.total >= 4) return 'rgba(6, 182, 212, 0.3)'
   if (day.total >= 1) return 'rgba(6, 182, 212, 0.15)'
@@ -109,11 +109,17 @@ function getDayCellColor(day: DayData): string {
 }
 
 function getDayCellBorder(day: DayData): string {
-  if (day.superSupremeCount > 0) return '1px solid rgba(249, 115, 22, 0.6)'
+  if (day.superSupremeCount > 0) return '2px solid rgba(255, 80, 30, 0.9)'
   if (day.supremeCount > 0) return '1px solid rgba(245, 158, 11, 0.5)'
   if (day.total >= 4) return '1px solid rgba(6, 182, 212, 0.4)'
   if (day.total >= 1) return '1px solid rgba(6, 182, 212, 0.2)'
   return '1px solid var(--border-color)'
+}
+
+function getDayCellBoxShadow(day: DayData): string {
+  if (day.superSupremeCount > 0) return '0 0 12px rgba(255, 80, 30, 0.4), inset 0 0 8px rgba(255, 80, 30, 0.15)'
+  if (day.supremeCount > 0) return '0 0 6px rgba(245, 158, 11, 0.2)'
+  return 'none'
 }
 
 function tierBadge(tier: AlignmentTier): { color: string; label: string } {
@@ -360,6 +366,7 @@ export default function CalendarView({ profile }: { profile: UserProfile }) {
                     border: todayHighlight
                       ? '2px solid var(--accent-cyan)'
                       : getDayCellBorder(day),
+                    boxShadow: todayHighlight ? 'none' : getDayCellBoxShadow(day),
                     textDecoration: 'none',
                     minHeight: 0,
                   }}
@@ -416,7 +423,7 @@ export default function CalendarView({ profile }: { profile: UserProfile }) {
             {[
               { label: 'Standard', color: 'rgba(6, 182, 212, 0.3)', dot: '#06b6d4' },
               { label: 'Supreme', color: 'rgba(245, 158, 11, 0.3)', dot: '#f59e0b' },
-              { label: 'Super Supreme', color: 'rgba(249, 115, 22, 0.35)', dot: '#f97316' },
+              { label: 'Super Supreme', color: 'rgba(220, 50, 20, 0.45)', dot: '#FF5020' },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-1.5">
                 <span
