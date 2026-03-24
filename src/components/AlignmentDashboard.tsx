@@ -586,7 +586,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       </div>
 
       {/* 24-Hour Timeline */}
-      <div className="terminal-card p-5 mb-6">
+      <div className="terminal-card p-5 mb-6" style={{ overflow: 'visible' }}>
         <p className="text-xs uppercase tracking-wider mb-4" style={{ color: 'var(--text-secondary)' }}>
           24-Hour Alignment Timeline
         </p>
@@ -622,8 +622,8 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 )}
 
                 {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-50 pointer-events-none">
-                  <div className="terminal-card p-3 min-w-[220px] text-xs">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 hidden group-hover:block z-50 pointer-events-none" style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))' }}>
+                  <div className="p-3 min-w-[220px] text-xs rounded-lg" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
                     <p className="font-bold" style={{ color: PLANET_COLORS[planet] }}>
                       {PLANET_SYMBOLS[planet]} {planet} Hour
                     </p>
