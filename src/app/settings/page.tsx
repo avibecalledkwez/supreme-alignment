@@ -12,6 +12,8 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -84,6 +86,25 @@ export default function SettingsPage() {
     router.refresh()
   }
 
+  const handleDeleteAccount = async () => {
+    setDeleting(true)
+    try {
+      const res = await fetch('/api/delete-account', { method: 'POST' })
+      if (res.ok) {
+        await supabase.auth.signOut()
+        router.push('/login')
+        router.refresh()
+      } else {
+        setError('Failed to delete account. Please try again.')
+        setShowDeleteConfirm(false)
+      }
+    } catch {
+      setError('Failed to delete account. Please try again.')
+      setShowDeleteConfirm(false)
+    }
+    setDeleting(false)
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="terminal-card w-full max-w-lg p-8">
@@ -145,6 +166,47 @@ export default function SettingsPage() {
         >
           LOG OUT
         </button>
+
+        {/* Danger Zone - Delete Account */}
+        <div className="mt-8 p-4 rounded" style={{ background: 'rgba(239,68,68,0.05)', border: '1px solid rgba(239,68,68,0.2)' }}>
+          <p className="text-xs uppercase tracking-wider mb-1 font-bold" style={{ color: '#ef4444' }}>Danger Zone</p>
+          <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>
+            Permanently delete your account and all associated data. This action cannot be undone.
+          </p>
+          {!showDeleteConfirm ? (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-full py-3 rounded-lg text-sm font-semibold uppercase tracking-wider"
+              style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}
+            >
+              DELETE ACCOUNT
+            </button>
+          ) : (
+            <div>
+              <p className="text-sm mb-3 font-semibold" style={{ color: '#ef4444' }}>
+                Are you sure? This will permanently delete your account.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="flex-1 py-3 rounded-lg text-sm font-semibold uppercase tracking-wider"
+                  style={{ background: '#ef4444', color: '#fff', opacity: deleting ? 0.6 : 1 }}
+                >
+                  {deleting ? 'DELETING...' : 'YES, DELETE'}
+                </button>
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={deleting}
+                  className="flex-1 py-3 rounded-lg text-sm font-semibold uppercase tracking-wider"
+                  style={{ background: 'var(--bg-tertiary)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
+                >
+                  CANCEL
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

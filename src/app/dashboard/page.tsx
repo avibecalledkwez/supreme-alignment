@@ -60,6 +60,7 @@ export default async function DashboardPage() {
       navLinks={[
         { href: '/learn', label: 'Learn', color: 'var(--accent-cyan)' },
         { href: '/how-it-works', label: 'How It Works', color: 'var(--accent-purple)' },
+        { href: '/calendar', label: 'Calendar', color: 'var(--accent-amber)' },
         { href: '/settings', label: '⚙ Settings', color: 'var(--text-secondary)' },
       ]}
     />

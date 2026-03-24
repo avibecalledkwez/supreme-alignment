@@ -23,9 +23,34 @@ export default function SignupPage() {
     setError('')
 
     // Validate DOB format
-    const dobDate = new Date(dob)
+    const dobDate = new Date(dob + 'T00:00:00')
     if (isNaN(dobDate.getTime())) {
       setError('Invalid date of birth.')
+      setLoading(false)
+      return
+    }
+
+    // Validate DOB is reasonable
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    if (dobDate > today) {
+      setError('Date of birth cannot be in the future.')
+      setLoading(false)
+      return
+    }
+
+    const minDate = new Date('1900-01-01T00:00:00')
+    if (dobDate < minDate) {
+      setError('Date of birth must be after January 1, 1900.')
+      setLoading(false)
+      return
+    }
+
+    const ageCutoff = new Date(today)
+    ageCutoff.setFullYear(ageCutoff.getFullYear() - 13)
+    if (dobDate > ageCutoff) {
+      setError('You must be at least 13 years old to create an account.')
       setLoading(false)
       return
     }

@@ -70,6 +70,11 @@ export default function LoginPage() {
               className="w-full"
               placeholder="••••••••"
             />
+            <div className="text-right mt-1">
+              <Link href="/forgot-password" className="text-xs" style={{ color: 'var(--accent-cyan)' }}>
+                Forgot password?
+              </Link>
+            </div>
           </div>
 
           {error && (

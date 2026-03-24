@@ -12,6 +12,7 @@ import {
 import { calculateNumerology, calculateAllPersonalHours, personalYear, personalMonth as calcPersonalMonth } from '@/lib/numerology'
 import { findAlignments, type Alignment, type AlignmentTier } from '@/lib/alignment-engine'
 import Link from 'next/link'
+import ThemeToggle from './ThemeToggle'
 
 interface NavLink {
   href: string
@@ -337,6 +338,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
               ))}
             </div>
           )}
+          <ThemeToggle />
           <div className="text-right">
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Welcome back,</p>
             <p className="text-lg font-bold">{profile.first_name}</p>
