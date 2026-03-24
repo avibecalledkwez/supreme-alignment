@@ -597,7 +597,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
             const hasAlignment = entry.alignments.length > 0
             const barHeight = hasAlignment ? (entry.bestTier === 'super-supreme' ? '100%' : entry.bestTier === 'supreme' ? '85%' : '70%') : '35%'
             const planet = entry.planetaryHour.planet
-            const tierColor = entry.bestTier ? TIER_COLORS[entry.bestTier] : ''
+            const tierRgb = entry.bestTier === 'super-supreme' ? 'var(--tier-super-rgb)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme-rgb)' : ''
 
             return (
               <div
@@ -606,12 +606,12 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 style={{
                   height: barHeight,
                   background: hasAlignment
-                    ? tierColor
-                      ? `linear-gradient(to top, ${PLANET_COLORS[planet]}40, ${tierColor}90)`
+                    ? tierRgb
+                      ? `linear-gradient(to top, ${PLANET_COLORS[planet]}40, rgba(${tierRgb}, 0.56))`
                       : `linear-gradient(to top, ${PLANET_COLORS[planet]}40, ${entry.alignments[0].color}80)`
                     : `${PLANET_COLORS[planet]}25`,
                   border: isCurrent ? '2px solid #fff' : 'none',
-                  boxShadow: isCurrent ? '0 0 12px rgba(255,255,255,0.4)' : hasAlignment && tierColor ? `0 0 8px ${tierColor}30` : 'none',
+                  boxShadow: isCurrent ? '0 0 12px rgba(255,255,255,0.4)' : hasAlignment && tierRgb ? `0 0 8px rgba(${tierRgb}, 0.19)` : 'none',
                 }}
               >
                 {/* Current time marker */}
@@ -648,7 +648,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 {hasAlignment && (
                   <div
                     className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full"
-                    style={{ background: tierColor || entry.alignments[0].color }}
+                    style={{ background: entry.bestTier === 'super-supreme' ? 'var(--tier-super)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme)' : entry.alignments[0].color }}
                   />
                 )}
               </div>
