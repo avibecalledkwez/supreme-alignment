@@ -98,8 +98,8 @@ const ALIGNMENT_DETAILS: Record<string, { description: string; examples: string[
 
 const TIER_COLORS: Record<AlignmentTier, string> = {
   'standard': '',
-  'supreme': '#FFD700',
-  'super-supreme': '#FF6B2B',
+  'supreme': 'var(--tier-supreme)',
+  'super-supreme': 'var(--tier-super)',
 }
 
 export default function AlignmentDashboard({ profile, navLinks = [] }: { profile: UserProfile; navLinks?: NavLink[] }) {
@@ -391,12 +391,12 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
           {/* Day summary badges */}
           <div className="flex items-center gap-2 ml-auto">
             {superSupremeCount > 0 && (
-              <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(255,107,43,0.15)', color: '#FF6B2B', border: '1px solid rgba(255,107,43,0.3)' }}>
+              <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(var(--tier-super-rgb),0.15)', color: 'var(--tier-super)', border: '1px solid rgba(var(--tier-super-rgb),0.3)' }}>
                 👑 {superSupremeCount} Super Supreme
               </span>
             )}
             {supremeCount > 0 && (
-              <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(255,215,0,0.15)', color: '#FFD700', border: '1px solid rgba(255,215,0,0.3)' }}>
+              <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(var(--tier-supreme-rgb),0.15)', color: 'var(--tier-supreme)', border: '1px solid rgba(var(--tier-supreme-rgb),0.3)' }}>
                 ⚜️ {supremeCount} Supreme
               </span>
             )}
@@ -413,14 +413,14 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       {isViewingToday && activeAlignments.length > 0 && (
         <div className="alignment-active mb-6 rounded-lg p-4" style={{
           background: activeAlignments.some(a => a.tier === 'super-supreme')
-            ? 'linear-gradient(135deg, rgba(255,107,43,0.15), rgba(255,107,43,0.03))'
+            ? 'linear-gradient(135deg, rgba(var(--tier-super-rgb),0.15), rgba(var(--tier-super-rgb),0.03))'
             : activeAlignments.some(a => a.tier === 'supreme')
-              ? 'linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,215,0,0.03))'
+              ? 'linear-gradient(135deg, rgba(var(--tier-supreme-rgb),0.15), rgba(var(--tier-supreme-rgb),0.03))'
               : `linear-gradient(135deg, ${activeAlignments[0].color}15, ${activeAlignments[0].color}05)`,
           border: activeAlignments.some(a => a.tier === 'super-supreme')
-            ? '1px solid rgba(255,107,43,0.4)'
+            ? '1px solid rgba(var(--tier-super-rgb),0.4)'
             : activeAlignments.some(a => a.tier === 'supreme')
-              ? '1px solid rgba(255,215,0,0.4)'
+              ? '1px solid rgba(var(--tier-supreme-rgb),0.4)'
               : `1px solid ${activeAlignments[0].color}40`,
         }}>
           {activeAlignments.map((a, i) => (
@@ -429,7 +429,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 <span className="text-2xl">{a.icon}</span>
                 <div>
                   <p className="text-sm font-bold uppercase tracking-wider" style={{
-                    color: a.tier === 'super-supreme' ? '#FF6B2B' : a.tier === 'supreme' ? '#FFD700' : a.color
+                    color: a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
                   }}>
                     {a.label} — ACTIVE NOW
                   </p>
@@ -535,8 +535,8 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
               <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
                 {timeline.filter(e => e.alignments.length > 0).length} alignment windows
               </p>
-              {superSupremeCount > 0 && <p className="text-xs" style={{ color: '#FF6B2B' }}>👑 {superSupremeCount} Super Supreme</p>}
-              {supremeCount > 0 && <p className="text-xs" style={{ color: '#FFD700' }}>⚜️ {supremeCount} Supreme</p>}
+              {superSupremeCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-super)' }}>👑 {superSupremeCount} Super Supreme</p>}
+              {supremeCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-supreme)' }}>⚜️ {supremeCount} Supreme</p>}
               {standardCount > 0 && <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{standardCount} Standard</p>}
             </div>
           ) : (
@@ -575,12 +575,12 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
             <span className="text-xs" style={{ color: 'var(--text-secondary)' }}>Standard — Planet + Hour aligned</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm" style={{ background: '#FFD700' }} />
-            <span className="text-xs" style={{ color: '#FFD700' }}>⚜️ Supreme — Planet + Hour + Day energy aligned</span>
+            <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--tier-supreme)' }} />
+            <span className="text-xs" style={{ color: 'var(--tier-supreme)' }}>⚜️ Supreme — Planet + Hour + Day energy aligned</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-sm" style={{ background: '#FF6B2B' }} />
-            <span className="text-xs" style={{ color: '#FF6B2B' }}>👑 Super Supreme — Planet + Hour + Day + Month energy aligned</span>
+            <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--tier-super)' }} />
+            <span className="text-xs" style={{ color: 'var(--tier-super)' }}>👑 Super Supreme — Planet + Hour + Day + Month energy aligned</span>
           </div>
         </div>
       </div>
@@ -635,7 +635,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                     {hasAlignment && (
                       <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
                         {entry.alignments.map((a, i) => (
-                          <p key={i} style={{ color: a.tier === 'super-supreme' ? '#FF6B2B' : a.tier === 'supreme' ? '#FFD700' : a.color }}>
+                          <p key={i} style={{ color: a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>
                             {a.icon} {a.label}
                           </p>
                         ))}
@@ -711,9 +711,9 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                       background: isCurrent
                         ? 'rgba(255, 255, 255, 0.06)'
                         : entry.bestTier === 'super-supreme'
-                          ? 'rgba(255, 107, 43, 0.04)'
+                          ? 'rgba(var(--tier-super-rgb), 0.04)'
                           : entry.bestTier === 'supreme'
-                            ? 'rgba(255, 215, 0, 0.04)'
+                            ? 'rgba(var(--tier-supreme-rgb), 0.04)'
                             : 'transparent',
                     }}
                   >
@@ -744,16 +744,16 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                 className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase"
                                 style={{
                                   background: a.tier === 'super-supreme'
-                                    ? 'rgba(255,107,43,0.2)'
+                                    ? 'rgba(var(--tier-super-rgb),0.2)'
                                     : a.tier === 'supreme'
-                                      ? 'rgba(255,215,0,0.2)'
+                                      ? 'rgba(var(--tier-supreme-rgb),0.2)'
                                       : `${a.color}20`,
                                   color: a.tier === 'super-supreme'
-                                    ? '#FF6B2B'
+                                    ? 'var(--tier-super)'
                                     : a.tier === 'supreme'
-                                      ? '#FFD700'
+                                      ? 'var(--tier-supreme)'
                                       : a.color,
-                                  border: `1px solid ${a.tier === 'super-supreme' ? 'rgba(255,107,43,0.4)' : a.tier === 'supreme' ? 'rgba(255,215,0,0.4)' : a.color + '40'}`,
+                                  border: `1px solid ${a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.4)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.4)' : a.color + '40'}`,
                                 }}
                               >
                                 {a.icon} {a.label} {isExpanded ? '▾' : '▸'}
@@ -767,11 +767,11 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                 if (!detail) return null
                                 return (
                                   <div key={i} className="p-3 rounded-lg" style={{
-                                    background: a.tier === 'super-supreme' ? 'rgba(255,107,43,0.06)' : a.tier === 'supreme' ? 'rgba(255,215,0,0.06)' : `${a.color}08`,
-                                    border: `1px solid ${a.tier === 'super-supreme' ? 'rgba(255,107,43,0.2)' : a.tier === 'supreme' ? 'rgba(255,215,0,0.2)' : a.color + '25'}`,
+                                    background: a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.06)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.06)' : `${a.color}08`,
+                                    border: `1px solid ${a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.2)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.2)' : a.color + '25'}`,
                                   }}>
                                     <p className="text-xs font-bold mb-1" style={{
-                                      color: a.tier === 'super-supreme' ? '#FF6B2B' : a.tier === 'supreme' ? '#FFD700' : a.color
+                                      color: a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
                                     }}>
                                       {a.icon} {a.label}
                                     </p>
@@ -784,7 +784,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                     <ul className="space-y-1">
                                       {detail.examples.map((ex, j) => (
                                         <li key={j} className="text-[11px] flex items-start gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                                          <span style={{ color: a.tier === 'super-supreme' ? '#FF6B2B' : a.tier === 'supreme' ? '#FFD700' : a.color }}>›</span> {ex}
+                                          <span style={{ color: a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>›</span> {ex}
                                         </li>
                                       ))}
                                     </ul>

@@ -12,6 +12,10 @@
   --accent-pink: #ec4899;
   --accent-amber: #f59e0b;
   --accent-cyan: #06b6d4;
+  --tier-supreme: #FFD700;
+  --tier-supreme-rgb: 255, 215, 0;
+  --tier-super: #FF6B2B;
+  --tier-super-rgb: 255, 107, 43;
   --glow-opacity: 0.15;
   --glow-inset-opacity: 0.05;
   --terminal-line-opacity: 0.3;
@@ -29,6 +33,10 @@
   --accent-pink: #db2777;
   --accent-amber: #d97706;
   --accent-cyan: #0891b2;
+  --tier-supreme: #B8860B;
+  --tier-supreme-rgb: 184, 134, 11;
+  --tier-super: #D4440A;
+  --tier-super-rgb: 212, 68, 10;
   --glow-opacity: 0.25;
   --glow-inset-opacity: 0.08;
   --terminal-line-opacity: 0.5;
