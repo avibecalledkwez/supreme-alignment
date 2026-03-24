@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import {
-  calculatePlanetaryHoursForDate,
+  calculateCalendarDayHours,
   findCurrentPlanetaryHour,
   getSunTimes,
   PLANET_COLORS,
@@ -152,8 +152,8 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
     // Determine which date to compute for
     const viewDate = isViewingToday ? currentTime : new Date(selectedDate + 'T12:00:00')
 
-    // Planetary hours for the viewed date
-    const hours = calculatePlanetaryHoursForDate(viewDate, lat, lon)
+    // Planetary hours for the viewed calendar day (midnight to midnight)
+    const hours = calculateCalendarDayHours(viewDate, lat, lon)
 
     // Current planetary hour (always based on NOW, for the live indicator)
     const current = findCurrentPlanetaryHour(currentTime, lat, lon)

@@ -136,6 +136,55 @@ export function findCurrentPlanetaryHour(
   return null
 }
 
+/**
+ * Get planetary hours for a calendar day (midnight to midnight).
+ * Combines yesterday's nighttime hours (that spill past midnight into today)
+ * + today's daytime hours + today's nighttime hours (up to midnight).
+ */
+export function calculateCalendarDayHours(
+  calendarDate: Date,
+  latitude: number,
+  longitude: number
+): PlanetaryHour[] {
+  const year = calendarDate.getFullYear()
+  const month = calendarDate.getMonth()
+  const day = calendarDate.getDate()
+  const midnightStart = new Date(year, month, day, 0, 0, 0).getTime()
+  const midnightEnd = new Date(year, month, day + 1, 0, 0, 0).getTime()
+
+  // Yesterday's planetary hours (sunrise-to-sunrise): nighttime hours may spill into today
+  const yesterday = new Date(year, month, day - 1)
+  const yesterdayHours = calculatePlanetaryHoursForDate(yesterday, latitude, longitude)
+
+  // Today's planetary hours (sunrise-to-sunrise): daytime + nighttime
+  const todayHours = calculatePlanetaryHoursForDate(calendarDate, latitude, longitude)
+
+  const result: PlanetaryHour[] = []
+
+  // Add yesterday's nighttime hours that fall after midnight (into today)
+  for (const h of yesterdayHours) {
+    if (h.end.getTime() > midnightStart && h.start.getTime() < midnightStart) {
+      // Straddles midnight — include it (starts before midnight, ends after)
+      result.push(h)
+    } else if (h.start.getTime() >= midnightStart && h.end.getTime() <= midnightEnd) {
+      // Fully within today
+      result.push(h)
+    }
+  }
+
+  // Add today's hours that fall before midnight
+  for (const h of todayHours) {
+    if (h.start.getTime() >= midnightStart && h.start.getTime() < midnightEnd) {
+      result.push(h)
+    }
+  }
+
+  // Sort by start time
+  result.sort((a, b) => a.start.getTime() - b.start.getTime())
+
+  return result
+}
+
 export function getSunTimes(date: Date, latitude: number, longitude: number) {
   const day = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12, 0, 0)
   const times = SunCalc.getTimes(day, latitude, longitude)

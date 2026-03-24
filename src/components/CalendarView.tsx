@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import {
-  calculatePlanetaryHoursForDate,
+  calculateCalendarDayHours,
 } from '@/lib/planetary-hours'
 import {
   calculateAllPersonalHours,
@@ -54,7 +54,7 @@ function computeDayAlignments(
   birthMonth: number,
   birthDay: number,
 ): DayData {
-  const hours = calculatePlanetaryHoursForDate(dayDate, lat, lon)
+  const hours = calculateCalendarDayHours(dayDate, lat, lon)
   const personalHoursAll = calculateAllPersonalHours(birthMonth, birthDay, dayDate)
   const pYear = personalYear(birthMonth, birthDay, dayDate.getFullYear())
   const pMonth = calcPersonalMonth(pYear, dayDate.getMonth() + 1)
