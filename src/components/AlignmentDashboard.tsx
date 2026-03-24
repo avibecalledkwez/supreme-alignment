@@ -187,17 +187,24 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
 
     // Build timeline for viewed date
     const personalHoursAll = calculateAllPersonalHours(birthMonth, birthDay, viewDate)
+    const nowMs = currentTime.getTime()
     const entries: TimelineEntry[] = hours.map((ph) => {
-      const clockHour = ph.start.getHours()
       const mins = ph.start.getMinutes()
-      const period = clockHour >= 12 ? 'PM' : 'AM'
-      const displayHour = clockHour === 0 ? 12 : clockHour > 12 ? clockHour - 12 : clockHour
+      const startClockHour = ph.start.getHours()
+      const period = startClockHour >= 12 ? 'PM' : 'AM'
+      const displayHour = startClockHour === 0 ? 12 : startClockHour > 12 ? startClockHour - 12 : startClockHour
       const label = `${displayHour}:${mins.toString().padStart(2, '0')} ${period}`
-      const pHour = personalHoursAll[clockHour] ?? 0
-      const aligns = findAlignments(ph.planet, pHour, pMonth, pMonth)
+
+      // Check if this planetary hour is currently active
+      const isCurrentlyActive = isViewingToday && nowMs >= ph.start.getTime() && nowMs < ph.end.getTime()
+
+      // For the active planetary hour, use the CURRENT clock hour (matches the banner)
+      // For all other hours, use the planetary hour's start time
+      const clockHourForCalc = isCurrentlyActive ? currentTime.getHours() : startClockHour
+      const pHour = personalHoursAll[clockHourForCalc] ?? 0
 
       // For the viewed date, use the correct personal day
-      const { personalDay: pDayForDate } = calculateNumerology(birthMonth, birthDay, new Date(viewDate.getFullYear(), viewDate.getMonth(), viewDate.getDate(), clockHour))
+      const { personalDay: pDayForDate } = calculateNumerology(birthMonth, birthDay, new Date(viewDate.getFullYear(), viewDate.getMonth(), viewDate.getDate(), clockHourForCalc))
       const alignsCorrect = findAlignments(ph.planet, pHour, pDayForDate, pMonth)
 
       const bestTier = alignsCorrect.length > 0
@@ -218,7 +225,6 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
 
     // Find next alignment (only relevant when viewing today)
     if (isViewingToday) {
-      const nowMs = currentTime.getTime()
       const futureWithAlignments = entries.filter(
         (e) => e.alignments.length > 0 && e.planetaryHour.end.getTime() > nowMs
       )
