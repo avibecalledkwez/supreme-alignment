@@ -42,6 +42,7 @@ interface TimelineEntry {
   alignments: Alignment[]
   clockHourLabel: string
   bestTier: AlignmentTier | null
+  zrMatch: boolean
 }
 
 // Alignment details for expanded view
@@ -107,6 +108,7 @@ const TIER_COLORS: Record<AlignmentTier, string> = {
   'standard': '',
   'supreme': 'var(--tier-supreme)',
   'super-supreme': 'var(--tier-super)',
+  'transcendent': 'var(--tier-transcendent)',
 }
 
 export default function AlignmentDashboard({ profile, navLinks = [] }: { profile: UserProfile; navLinks?: NavLink[] }) {
@@ -184,9 +186,39 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
     const pYear = personalYear(birthMonth, birthDay, viewYear)
     const pMonth = calcPersonalMonth(pYear, viewMonth)
 
+    // Calculate Zodiacal Releasing if birth data available
+    let currentZrState: ZRState | null = null
+    if (profile.birth_time && profile.birth_latitude != null && profile.birth_longitude != null) {
+      const [bHour, bMinute] = profile.birth_time.split(':').map(Number)
+      const natal = calculateNatalChart({
+        birthYear: parseInt(birthParts[0], 10),
+        birthMonth,
+        birthDay,
+        birthHour: bHour,
+        birthMinute: bMinute,
+        birthLat: profile.birth_latitude,
+        birthLng: profile.birth_longitude,
+      })
+      const birthDate = new Date(
+        parseInt(birthParts[0], 10), birthMonth - 1, birthDay,
+        bHour, bMinute
+      )
+      currentZrState = calculateZRState(natal.lotOfFortuneSignIndex, birthDate, currentTime)
+      setZrState(currentZrState)
+      if (currentZrState && current) {
+        setZrAligned(checkZRAlignment(currentZrState.l4.ruler, current.planet))
+      } else {
+        setZrAligned(false)
+      }
+    } else {
+      setZrState(null)
+      setZrAligned(false)
+    }
+
     // Active alignments for current hour (live)
     if (current && isViewingToday) {
-      const aligns = findAlignments(current.planet, numProfile.personalHour, numProfile.personalDay, numProfile.personalMonth)
+      const currentHourZr = currentZrState && checkZRAlignment(currentZrState.l4.ruler, current.planet)
+      const aligns = findAlignments(current.planet, numProfile.personalHour, numProfile.personalDay, numProfile.personalMonth, currentHourZr || false)
       setActiveAlignments(aligns)
       dataRef.current.activeAlignments = aligns
     } else {
@@ -214,10 +246,12 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
 
       // For the viewed date, use the correct personal day
       const { personalDay: pDayForDate } = calculateNumerology(birthMonth, birthDay, new Date(viewDate.getFullYear(), viewDate.getMonth(), viewDate.getDate(), clockHourForCalc))
-      const alignsCorrect = findAlignments(ph.planet, pHour, pDayForDate, pMonth)
+      const hourZrMatch = currentZrState ? checkZRAlignment(currentZrState.l4.ruler, ph.planet) : false
+      const alignsCorrect = findAlignments(ph.planet, pHour, pDayForDate, pMonth, hourZrMatch)
 
       const bestTier = alignsCorrect.length > 0
-        ? (alignsCorrect.some(a => a.tier === 'super-supreme') ? 'super-supreme' as const
+        ? (alignsCorrect.some(a => a.tier === 'transcendent') ? 'transcendent' as const
+          : alignsCorrect.some(a => a.tier === 'super-supreme') ? 'super-supreme' as const
           : alignsCorrect.some(a => a.tier === 'supreme') ? 'supreme' as const
           : 'standard' as const)
         : null
@@ -228,6 +262,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
         alignments: alignsCorrect,
         clockHourLabel: label,
         bestTier,
+        zrMatch: hourZrMatch,
       }
     })
     setTimeline(entries)
@@ -266,33 +301,6 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       dataRef.current.nextAlignment = null
     }
 
-    // Calculate Zodiacal Releasing if birth data available
-    if (profile.birth_time && profile.birth_latitude != null && profile.birth_longitude != null) {
-      const [bHour, bMinute] = profile.birth_time.split(':').map(Number)
-      const natal = calculateNatalChart({
-        birthYear: parseInt(birthParts[0], 10),
-        birthMonth,
-        birthDay,
-        birthHour: bHour,
-        birthMinute: bMinute,
-        birthLat: profile.birth_latitude,
-        birthLng: profile.birth_longitude,
-      })
-      const birthDate = new Date(
-        parseInt(birthParts[0], 10), birthMonth - 1, birthDay,
-        bHour, bMinute
-      )
-      const zr = calculateZRState(natal.lotOfFortuneSignIndex, birthDate, currentTime)
-      setZrState(zr)
-      if (zr && current) {
-        setZrAligned(checkZRAlignment(zr.l4.ruler, current.planet))
-      } else {
-        setZrAligned(false)
-      }
-    } else {
-      setZrState(null)
-      setZrAligned(false)
-    }
   }, [lat, lon, birthMonth, birthDay, selectedDate, isViewingToday, activeAlignments.length, profile.birth_time, profile.birth_latitude, profile.birth_longitude])
 
   useEffect(() => {
@@ -348,7 +356,8 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
 
   const viewDate = isViewingToday ? now : new Date(selectedDate + 'T12:00:00')
 
-  // Count supreme/super-supreme for the day
+  // Count tiers for the day
+  const transcendentCount = timeline.filter(e => e.bestTier === 'transcendent').length
   const supremeCount = timeline.filter(e => e.bestTier === 'supreme').length
   const superSupremeCount = timeline.filter(e => e.bestTier === 'super-supreme').length
   const standardCount = timeline.filter(e => e.alignments.length > 0 && e.bestTier === 'standard').length
@@ -433,6 +442,11 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
 
           {/* Day summary badges */}
           <div className="flex items-center gap-2 ml-auto">
+            {transcendentCount > 0 && (
+              <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(var(--tier-transcendent-rgb),0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb),0.3)' }}>
+                🌌 {transcendentCount} Transcendent
+              </span>
+            )}
             {superSupremeCount > 0 && (
               <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(var(--tier-super-rgb),0.15)', color: 'var(--tier-super)', border: '1px solid rgba(var(--tier-super-rgb),0.3)' }}>
                 👑 {superSupremeCount} Super Supreme
@@ -455,16 +469,20 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       {/* Active Alignment Banner (only when viewing today) */}
       {isViewingToday && activeAlignments.length > 0 && (
         <div className="alignment-active mb-6 rounded-lg p-4" style={{
-          background: activeAlignments.some(a => a.tier === 'super-supreme')
-            ? 'linear-gradient(135deg, rgba(var(--tier-super-rgb),0.15), rgba(var(--tier-super-rgb),0.03))'
-            : activeAlignments.some(a => a.tier === 'supreme')
-              ? 'linear-gradient(135deg, rgba(var(--tier-supreme-rgb),0.15), rgba(var(--tier-supreme-rgb),0.03))'
-              : `linear-gradient(135deg, ${activeAlignments[0].color}15, ${activeAlignments[0].color}05)`,
-          border: activeAlignments.some(a => a.tier === 'super-supreme')
-            ? '1px solid rgba(var(--tier-super-rgb),0.4)'
-            : activeAlignments.some(a => a.tier === 'supreme')
-              ? '1px solid rgba(var(--tier-supreme-rgb),0.4)'
-              : `1px solid ${activeAlignments[0].color}40`,
+          background: activeAlignments.some(a => a.tier === 'transcendent')
+            ? 'linear-gradient(135deg, rgba(var(--tier-transcendent-rgb),0.15), rgba(var(--tier-transcendent-rgb),0.03))'
+            : activeAlignments.some(a => a.tier === 'super-supreme')
+              ? 'linear-gradient(135deg, rgba(var(--tier-super-rgb),0.15), rgba(var(--tier-super-rgb),0.03))'
+              : activeAlignments.some(a => a.tier === 'supreme')
+                ? 'linear-gradient(135deg, rgba(var(--tier-supreme-rgb),0.15), rgba(var(--tier-supreme-rgb),0.03))'
+                : `linear-gradient(135deg, ${activeAlignments[0].color}15, ${activeAlignments[0].color}05)`,
+          border: activeAlignments.some(a => a.tier === 'transcendent')
+            ? '1px solid rgba(var(--tier-transcendent-rgb),0.4)'
+            : activeAlignments.some(a => a.tier === 'super-supreme')
+              ? '1px solid rgba(var(--tier-super-rgb),0.4)'
+              : activeAlignments.some(a => a.tier === 'supreme')
+                ? '1px solid rgba(var(--tier-supreme-rgb),0.4)'
+                : `1px solid ${activeAlignments[0].color}40`,
         }}>
           {activeAlignments.map((a, i) => (
             <div key={i} className={i > 0 ? 'mt-3' : ''}>
@@ -472,7 +490,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 <span className="text-2xl">{a.icon}</span>
                 <div>
                   <p className="text-sm font-bold uppercase tracking-wider" style={{
-                    color: a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
+                    color: a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
                   }}>
                     {a.label} — ACTIVE NOW
                   </p>
@@ -578,6 +596,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
               <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
                 {timeline.filter(e => e.alignments.length > 0).length} alignment windows
               </p>
+              {transcendentCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-transcendent)' }}>🌌 {transcendentCount} Transcendent</p>}
               {superSupremeCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-super)' }}>👑 {superSupremeCount} Super Supreme</p>}
               {supremeCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-supreme)' }}>⚜️ {supremeCount} Supreme</p>}
               {standardCount > 0 && <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>{standardCount} Standard</p>}
@@ -619,11 +638,15 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--tier-supreme)' }} />
-            <span className="text-xs" style={{ color: 'var(--tier-supreme)' }}>⚜️ Supreme — Planet + Hour + Day energy aligned</span>
+            <span className="text-xs" style={{ color: 'var(--tier-supreme)' }}>⚜️ Supreme — + Day aligned</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--tier-super)' }} />
-            <span className="text-xs" style={{ color: 'var(--tier-super)' }}>👑 Super Supreme — Planet + Hour + Day + Month energy aligned</span>
+            <span className="text-xs" style={{ color: 'var(--tier-super)' }}>👑 Super Supreme — + Month aligned</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--tier-transcendent)' }} />
+            <span className="text-xs" style={{ color: 'var(--tier-transcendent)' }}>🌌 Transcendent — + Zodiacal Releasing aligned</span>
           </div>
         </div>
       </div>
@@ -647,9 +670,9 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
           {timeline.map((entry, idx) => {
             const isCurrent = isCurrentHour(entry)
             const hasAlignment = entry.alignments.length > 0
-            const barHeight = hasAlignment ? (entry.bestTier === 'super-supreme' ? '100%' : entry.bestTier === 'supreme' ? '85%' : '70%') : '35%'
+            const barHeight = hasAlignment ? (entry.bestTier === 'transcendent' ? '100%' : entry.bestTier === 'super-supreme' ? '95%' : entry.bestTier === 'supreme' ? '85%' : '70%') : '35%'
             const planet = entry.planetaryHour.planet
-            const tierRgb = entry.bestTier === 'super-supreme' ? 'var(--tier-super-rgb)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme-rgb)' : ''
+            const tierRgb = entry.bestTier === 'transcendent' ? 'var(--tier-transcendent-rgb)' : entry.bestTier === 'super-supreme' ? 'var(--tier-super-rgb)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme-rgb)' : ''
 
             return (
               <div
@@ -684,10 +707,13 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                     </p>
                     <p className="mt-1">Personal Hour: <span style={{ color: 'var(--accent-cyan)' }}>{entry.personalHour}</span></p>
                     {isCurrent && <p className="mt-1 font-bold" style={{ color: '#fff' }}>◉ YOU ARE HERE</p>}
+                    {entry.zrMatch && (
+                      <p className="mt-1" style={{ color: 'var(--tier-transcendent)' }}>ZR L4 ruler matches this hour</p>
+                    )}
                     {hasAlignment && (
                       <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
                         {entry.alignments.map((a, i) => (
-                          <p key={i} style={{ color: a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>
+                          <p key={i} style={{ color: a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>
                             {a.icon} {a.label}
                           </p>
                         ))}
@@ -696,11 +722,18 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                   </div>
                 </div>
 
+                {/* ZR match indicator */}
+                {entry.zrMatch && !hasAlignment && (
+                  <div
+                    className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full"
+                    style={{ background: 'var(--tier-transcendent)', opacity: 0.6 }}
+                  />
+                )}
                 {/* Tier indicator dot */}
                 {hasAlignment && (
                   <div
                     className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full"
-                    style={{ background: entry.bestTier === 'super-supreme' ? 'var(--tier-super)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme)' : entry.alignments[0].color }}
+                    style={{ background: entry.bestTier === 'transcendent' ? 'var(--tier-transcendent)' : entry.bestTier === 'super-supreme' ? 'var(--tier-super)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme)' : entry.alignments[0].color }}
                   />
                 )}
               </div>
@@ -740,6 +773,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 <th className="text-left py-2 px-2">PLANET</th>
                 <th className="text-center py-2 px-2">P.HOUR</th>
                 <th className="text-left py-2 px-2">TYPE</th>
+                {zrState && <th className="text-center py-2 px-2" style={{ color: 'var(--tier-transcendent)' }}>ZR</th>}
                 <th className="text-left py-2 px-2">ALIGNMENTS</th>
               </tr>
             </thead>
@@ -762,11 +796,13 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                       borderBottom: '1px solid var(--border-color)',
                       background: isCurrent
                         ? 'rgba(255, 255, 255, 0.06)'
-                        : entry.bestTier === 'super-supreme'
-                          ? 'rgba(var(--tier-super-rgb), 0.04)'
-                          : entry.bestTier === 'supreme'
-                            ? 'rgba(var(--tier-supreme-rgb), 0.04)'
-                            : 'transparent',
+                        : entry.bestTier === 'transcendent'
+                          ? 'rgba(var(--tier-transcendent-rgb), 0.06)'
+                          : entry.bestTier === 'super-supreme'
+                            ? 'rgba(var(--tier-super-rgb), 0.04)'
+                            : entry.bestTier === 'supreme'
+                              ? 'rgba(var(--tier-supreme-rgb), 0.04)'
+                              : 'transparent',
                     }}
                   >
                     <td className="py-2 px-2 font-mono" style={{
@@ -786,6 +822,21 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                     <td className="py-2 px-2" style={{ color: 'var(--text-secondary)' }}>
                       {entry.planetaryHour.isDay ? '☀ Day' : '☾ Night'}
                     </td>
+                    {zrState && (
+                      <td className="py-2 px-2 text-center">
+                        {entry.zrMatch ? (
+                          <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold" style={{
+                            background: 'rgba(var(--tier-transcendent-rgb),0.15)',
+                            color: 'var(--tier-transcendent)',
+                            border: '1px solid rgba(var(--tier-transcendent-rgb),0.3)',
+                          }}>
+                            ✦
+                          </span>
+                        ) : (
+                          <span style={{ color: 'var(--text-secondary)', opacity: 0.3 }}>—</span>
+                        )}
+                      </td>
+                    )}
                     <td className="py-2 px-2">
                       {entry.alignments.length > 0 ? (
                         <div>
@@ -795,17 +846,21 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                 key={i}
                                 className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase"
                                 style={{
-                                  background: a.tier === 'super-supreme'
-                                    ? 'rgba(var(--tier-super-rgb),0.2)'
-                                    : a.tier === 'supreme'
-                                      ? 'rgba(var(--tier-supreme-rgb),0.2)'
-                                      : `${a.color}20`,
-                                  color: a.tier === 'super-supreme'
-                                    ? 'var(--tier-super)'
-                                    : a.tier === 'supreme'
-                                      ? 'var(--tier-supreme)'
-                                      : a.color,
-                                  border: `1px solid ${a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.4)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.4)' : a.color + '40'}`,
+                                  background: a.tier === 'transcendent'
+                                    ? 'rgba(var(--tier-transcendent-rgb),0.2)'
+                                    : a.tier === 'super-supreme'
+                                      ? 'rgba(var(--tier-super-rgb),0.2)'
+                                      : a.tier === 'supreme'
+                                        ? 'rgba(var(--tier-supreme-rgb),0.2)'
+                                        : `${a.color}20`,
+                                  color: a.tier === 'transcendent'
+                                    ? 'var(--tier-transcendent)'
+                                    : a.tier === 'super-supreme'
+                                      ? 'var(--tier-super)'
+                                      : a.tier === 'supreme'
+                                        ? 'var(--tier-supreme)'
+                                        : a.color,
+                                  border: `1px solid ${a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.4)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.4)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.4)' : a.color + '40'}`,
                                 }}
                               >
                                 {a.icon} {a.label} {isExpanded ? '▾' : '▸'}
@@ -819,11 +874,11 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                 if (!detail) return null
                                 return (
                                   <div key={i} className="p-3 rounded-lg" style={{
-                                    background: a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.06)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.06)' : `${a.color}08`,
-                                    border: `1px solid ${a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.2)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.2)' : a.color + '25'}`,
+                                    background: a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.06)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.06)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.06)' : `${a.color}08`,
+                                    border: `1px solid ${a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.2)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.2)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.2)' : a.color + '25'}`,
                                   }}>
                                     <p className="text-xs font-bold mb-1" style={{
-                                      color: a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
+                                      color: a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
                                     }}>
                                       {a.icon} {a.label}
                                     </p>
@@ -836,7 +891,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                     <ul className="space-y-1">
                                       {detail.examples.map((ex, j) => (
                                         <li key={j} className="text-[11px] flex items-start gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                                          <span style={{ color: a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>›</span> {ex}
+                                          <span style={{ color: a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>›</span> {ex}
                                         </li>
                                       ))}
                                     </ul>

@@ -1,7 +1,7 @@
 import { type Planet } from './planetary-hours'
 
 export type AlignmentTheme = 'financial' | 'love' | 'health' | 'creativity' | 'spiritual'
-export type AlignmentTier = 'standard' | 'supreme' | 'super-supreme'
+export type AlignmentTier = 'standard' | 'supreme' | 'super-supreme' | 'transcendent'
 
 export interface Alignment {
   theme: AlignmentTheme
@@ -10,6 +10,7 @@ export interface Alignment {
   color: string
   icon: string
   tier: AlignmentTier
+  zrBoosted: boolean
 }
 
 interface AlignmentRule {
@@ -79,6 +80,7 @@ const TIER_LABELS: Record<AlignmentTier, string> = {
   'standard': 'Alignment',
   'supreme': 'Supreme Alignment',
   'super-supreme': 'Super Supreme Alignment',
+  'transcendent': 'Transcendent Alignment',
 }
 
 const TIER_SUGGESTIONS: Record<AlignmentTier, Record<AlignmentTheme, string>> = {
@@ -103,20 +105,32 @@ const TIER_SUGGESTIONS: Record<AlignmentTier, Record<AlignmentTheme, string>> = 
     creativity: 'SUPER SUPREME: Your entire numerological stack AND cosmic timing are in total creative resonance. Channel this rare convergence into your most ambitious creative vision.',
     spiritual: 'SUPER SUPREME: Month, day, hour, AND planetary energies are ALL unified in spiritual frequency. This is an extraordinarily rare portal — profound revelations, karmic clarity, and transcendent experiences are possible.',
   },
+  'transcendent': {
+    financial: 'TRANSCENDENT: All five layers converge — numerology (hour, day, month), planetary hour, AND your natal chart\'s Zodiacal Releasing time-lord ALL confirm this financial window. Your birth chart wrote this moment into your timeline. Act with absolute conviction.',
+    love: 'TRANSCENDENT: Every timing layer in existence is synchronized for love — your numerology stack, the planetary hour, AND your natal Zodiacal Releasing period. This is a fated window for connection. The cosmos and your birth chart agree: open your heart now.',
+    health: 'TRANSCENDENT: Five independent timing systems are unified for vitality. Your numerological cycles, the planetary hour, AND your natal time-lord period ALL point to physical transformation. Your body was born to peak in this moment.',
+    creativity: 'TRANSCENDENT: The rarest creative convergence possible — numerology, planetary hours, AND your natal Zodiacal Releasing are ALL channeling creative energy simultaneously. This is the window your birth chart encoded for your most important creative work.',
+    spiritual: 'TRANSCENDENT: All five layers of cosmic timing converge in spiritual frequency. Your numerology, the planetary hour, AND your natal time-lord period are unified. This is a fated spiritual portal — the kind of moment mystics wait lifetimes for.',
+  },
 }
 
 /**
  * Check all alignment rules and return matches with tier classification.
  *
- * Standard Alignment: Planet matches + Personal Hour matches
- * Supreme Alignment: Standard + Personal Day ALSO matches the theme's trigger numbers
- * Super Supreme Alignment: Supreme + Personal Month ALSO matches the theme's trigger numbers
+ * Standard Alignment: Planet matches + Personal Hour matches (2 layers)
+ * Supreme Alignment: Standard + Personal Day ALSO matches (3 layers)
+ * Super Supreme Alignment: Supreme + Personal Month ALSO matches (4 layers)
+ * Transcendent Alignment: Super Supreme + ZR L4 ruler matches planetary hour (5 layers)
+ *
+ * When ZR is aligned but tier is below Super Supreme, the alignment is marked
+ * as zrBoosted (shown with a ZR badge) but not promoted to Transcendent.
  */
 export function findAlignments(
   planet: Planet,
   personalHour: number,
   personalDay: number,
-  personalMonth: number
+  personalMonth: number,
+  zrAligned: boolean = false
 ): Alignment[] {
   return ALIGNMENT_RULES.filter(
     (rule) => rule.planets.includes(planet) && rule.personalHours.includes(personalHour)
@@ -125,7 +139,9 @@ export function findAlignments(
     const monthMatches = rule.personalHours.includes(personalMonth)
 
     let tier: AlignmentTier = 'standard'
-    if (dayMatches && monthMatches) {
+    if (dayMatches && monthMatches && zrAligned) {
+      tier = 'transcendent'
+    } else if (dayMatches && monthMatches) {
       tier = 'super-supreme'
     } else if (dayMatches) {
       tier = 'supreme'
@@ -136,13 +152,16 @@ export function findAlignments(
       ? rule.label
       : `${rule.label} — ${tierLabel}`
 
+    const iconPrefix = tier === 'transcendent' ? '🌌' : tier === 'super-supreme' ? '👑' : tier === 'supreme' ? '⚜️' : ''
+
     return {
       theme: rule.theme,
       label,
       suggestion: TIER_SUGGESTIONS[tier][rule.theme],
       color: rule.color,
-      icon: tier === 'super-supreme' ? `👑${rule.icon}` : tier === 'supreme' ? `⚜️${rule.icon}` : rule.icon,
+      icon: `${iconPrefix}${rule.icon}`,
       tier,
+      zrBoosted: zrAligned,
     }
   })
 }

@@ -447,8 +447,77 @@ export default function HowItWorksPage() {
                 Your monthly cycle, daily cycle, hourly cycle, AND the planetary hour are ALL vibrating at the
                 same frequency for this theme. Extraordinarily rare &mdash; when this happens, it&apos;s a
                 once-in-a-cycle convergence. All independent timing mechanisms pointing in the same
-                direction at the same moment. This is the highest tier of alignment the system can detect.
+                direction at the same moment.
               </p>
+            </div>
+
+            {/* Transcendent */}
+            <div
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--tier-transcendent)',
+                borderRadius: '8px',
+                padding: '1.25rem',
+                position: 'relative',
+                boxShadow: '0 0 20px rgba(var(--tier-transcendent-rgb), 0.15), inset 0 0 20px rgba(var(--tier-transcendent-rgb), 0.05)',
+              }}
+            >
+              <h3
+                style={{
+                  fontSize: '1rem',
+                  fontWeight: 700,
+                  color: 'var(--tier-transcendent)',
+                  marginBottom: '0.5rem',
+                }}
+              >
+                Transcendent Alignment 🌌
+              </h3>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+                5 LAYERS OF SYNCHRONICITY
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-transcendent-rgb), 0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)' }}>
+                  Planet Match
+                </div>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-transcendent-rgb), 0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)' }}>
+                  Personal Hour
+                </div>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-transcendent-rgb), 0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)' }}>
+                  Personal Day
+                </div>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-transcendent-rgb), 0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)' }}>
+                  Personal Month
+                </div>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-transcendent-rgb), 0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)' }}>
+                  ZR L4 Ruler
+                </div>
+              </div>
+
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+                The rarest and most powerful alignment possible. All four numerological layers AND your natal
+                chart&apos;s Zodiacal Releasing time-lord are synchronized. Your birth chart literally encoded this
+                moment into your timeline. When five independent timing systems &mdash; planetary hour, personal
+                hour, personal day, personal month, and your ZR L4 period ruler &mdash; all converge on the
+                same theme, you are in a fated window. Act with absolute conviction.
+              </p>
+
+              <div
+                style={{
+                  marginTop: '0.75rem',
+                  padding: '0.5rem 0.75rem',
+                  background: 'rgba(var(--tier-transcendent-rgb), 0.08)',
+                  borderRadius: '4px',
+                  borderLeft: '2px solid var(--tier-transcendent)',
+                  fontSize: '0.75rem',
+                  color: 'var(--text-secondary)',
+                  lineHeight: 1.6,
+                }}
+              >
+                <strong style={{ color: 'var(--tier-transcendent)' }}>Requires birth time:</strong> Transcendent
+                alignments use Zodiacal Releasing, which requires your exact birth time and birth city. Add
+                these in Settings to unlock this tier.
+              </div>
             </div>
           </div>
 
@@ -529,13 +598,247 @@ export default function HowItWorksPage() {
                     Once a month or less
                   </td>
                 </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--tier-transcendent)', fontWeight: 600 }}>
+                    Transcendent 🌌
+                  </td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>5</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                    Planet + Hour + Day + Month + ZR L4 Ruler
+                  </td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                    Extremely rare — once a year or less
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
         </section>
 
         {/* ============================================ */}
-        {/* SECTION 3: Practical Tips */}
+        {/* SECTION 3: Zodiacal Releasing */}
+        {/* ============================================ */}
+        <section className="terminal-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+          <h2
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              color: 'var(--tier-transcendent)',
+              marginBottom: '1rem',
+            }}
+          >
+            3. Zodiacal Releasing &amp; The Transcendent Tier
+          </h2>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+            Zodiacal Releasing (ZR) is a Hellenistic time-lord technique that divides your entire life into
+            cascading periods, each ruled by a zodiac sign and its planetary ruler. It adds a deeply personal,
+            birth-chart-based layer to your alignment calculations &mdash; the fifth and final layer that
+            unlocks the Transcendent tier.
+          </p>
+
+          {/* How ZR works */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            How Zodiacal Releasing Works
+          </h3>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            <div
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                padding: '0.75rem 1rem',
+                borderLeft: '3px solid var(--tier-transcendent)',
+              }}
+            >
+              <div style={{ fontWeight: 700, color: 'var(--tier-transcendent)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                The Lot of Fortune
+              </div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+                ZR begins with the <strong style={{ color: 'var(--text-primary)' }}>Lot of Fortune</strong> &mdash;
+                a sensitive point in your natal chart calculated from the positions of your Sun, Moon, and
+                Ascendant at the exact moment and location of your birth. The zodiac sign where your Lot of
+                Fortune falls becomes the starting point of your ZR timeline. This is why birth time and birth
+                city are required.
+              </p>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                padding: '0.75rem 1rem',
+                borderLeft: '3px solid var(--accent-purple)',
+              }}
+            >
+              <div style={{ fontWeight: 700, color: 'var(--accent-purple)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                Four Levels of Time Periods
+              </div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.5rem' }}>
+                From the Lot of Fortune sign, ZR generates four nested levels of time periods, each subdividing
+                the one above it:
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
+                {[
+                  { level: 'L1', name: 'Major Period', duration: 'Years to decades', desc: 'The broadest life chapter. Sets the overarching theme of an entire era of your life.' },
+                  { level: 'L2', name: 'Sub-Period', duration: 'Months to years', desc: 'Subdivisions within the major period. These shift the focus within the larger theme.' },
+                  { level: 'L3', name: 'Sub-Sub-Period', duration: 'Weeks to months', desc: 'Finer timing within each sub-period. Weekly and monthly rhythms become visible here.' },
+                  { level: 'L4', name: 'Micro-Period', duration: 'Hours to days', desc: 'The finest resolution. Each L4 period is ruled by a sign and its planetary ruler — this is the ruler that Supreme Alignment checks against the current planetary hour.' },
+                ].map((l) => (
+                  <div key={l.level} style={{ display: 'flex', gap: '0.5rem', fontSize: '0.8rem', padding: '0.375rem 0.5rem', background: 'var(--bg-primary)', borderRadius: '4px' }}>
+                    <span style={{ color: 'var(--tier-transcendent)', fontWeight: 700, minWidth: '2rem' }}>{l.level}</span>
+                    <div>
+                      <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{l.name}</span>
+                      <span style={{ color: 'var(--text-secondary)' }}> ({l.duration})</span>
+                      <span style={{ color: 'var(--text-secondary)' }}> — {l.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* How ZR creates Transcendent */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            How ZR Unlocks the Transcendent Tier
+          </h3>
+
+          <div
+            className="terminal-card"
+            style={{
+              padding: '1rem',
+              marginBottom: '1.25rem',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)',
+            }}
+          >
+            <p style={{ color: 'var(--tier-transcendent)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+              THE TRANSCENDENT CONDITION
+            </p>
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.875rem', lineHeight: 1.7 }}>
+              When you already have a <strong>Super Supreme</strong> alignment (planet + hour + day + month all
+              matching), and <em>additionally</em> your ZR L4 micro-period&apos;s ruling planet matches the
+              current planetary hour &mdash; that alignment is promoted to{' '}
+              <strong style={{ color: 'var(--tier-transcendent)' }}>Transcendent</strong>. Five independent
+              timing systems are all pointing in the same direction at the same moment. Your birth chart
+              literally scheduled this window.
+            </p>
+          </div>
+
+          {/* Peak, Trough, Loosing of the Bond */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            Peak Periods, Troughs &amp; Loosing of the Bond
+          </h3>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            <div
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                padding: '0.75rem 1rem',
+                borderLeft: '3px solid var(--accent-green)',
+              }}
+            >
+              <div style={{ fontWeight: 700, color: 'var(--accent-green)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                Peak Periods
+              </div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+                When the L2 sub-period sign forms a conjunction, trine, or sextile with your L1 major period
+                sign (0, 4, or 2 signs apart), you&apos;re in a <strong style={{ color: 'var(--accent-green)' }}>peak period</strong>.
+                These are times of heightened productivity, opportunity, and momentum. Alignments during peak
+                periods carry extra weight.
+              </p>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                padding: '0.75rem 1rem',
+                borderLeft: '3px solid var(--accent-pink)',
+              }}
+            >
+              <div style={{ fontWeight: 700, color: 'var(--accent-pink)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                Trough Periods
+              </div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+                When L2 forms a square or opposition with L1 (3 or 6 signs apart), you&apos;re in
+                a <strong style={{ color: 'var(--accent-pink)' }}>trough period</strong>. These are times of
+                challenge, restructuring, or inward focus. Use alignments during troughs for reflection,
+                preparation, and course correction rather than aggressive action.
+              </p>
+            </div>
+
+            <div
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--border-color)',
+                borderRadius: '6px',
+                padding: '0.75rem 1rem',
+                borderLeft: '3px solid var(--accent-amber)',
+              }}
+            >
+              <div style={{ fontWeight: 700, color: 'var(--accent-amber)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                Loosing of the Bond
+              </div>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+                When the L2 sign is directly opposite (6 signs from) your Lot of Fortune&apos;s natal sign,
+                a special condition called <strong style={{ color: 'var(--accent-amber)' }}>Loosing of the Bond</strong> is
+                active. This signals a major pivot or turning point &mdash; a time when circumstances may
+                shift dramatically. It&apos;s shown as a special indicator on the ZR panel of your dashboard.
+              </p>
+            </div>
+          </div>
+
+          {/* ZR column explanation */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            The ZR Column on Your Dashboard
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+            Once you add your birth time and birth city in Settings, the hour-by-hour table on your dashboard
+            gains a <strong style={{ color: 'var(--tier-transcendent)' }}>ZR column</strong>. Each hour where
+            the current planetary hour planet matches your ZR L4 ruler is marked with a{' '}
+            <span style={{ color: 'var(--tier-transcendent)' }}>✦</span> symbol. These are the hours where
+            your birth chart&apos;s time-lord agrees with the cosmic clock &mdash; even without a full
+            alignment, these hours carry personal significance.
+          </p>
+        </section>
+
+        {/* ============================================ */}
+        {/* SECTION 4: Practical Tips */}
         {/* ============================================ */}
         <section className="terminal-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
           <h2
@@ -546,7 +849,7 @@ export default function HowItWorksPage() {
               marginBottom: '1rem',
             }}
           >
-            3. Practical Tips
+            4. Practical Tips
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>

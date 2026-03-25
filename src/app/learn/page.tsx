@@ -603,7 +603,347 @@ export default function LearnPage() {
         </section>
 
         {/* ============================================ */}
-        {/* SECTION 3: How They Work Together */}
+        {/* SECTION 3: Zodiacal Releasing */}
+        {/* ============================================ */}
+        <section className="terminal-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
+          <h2
+            style={{
+              fontSize: '1.25rem',
+              fontWeight: 700,
+              color: 'var(--tier-transcendent)',
+              marginBottom: '1rem',
+            }}
+          >
+            3. What Is Zodiacal Releasing?
+          </h2>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '1rem' }}>
+            Zodiacal Releasing (ZR) is a predictive timing technique from the Hellenistic tradition of
+            astrology, attributed to the 2nd-century astrologer Vettius Valens. It is considered one of
+            the most powerful time-lord systems ever developed &mdash; a method for mapping the unfolding
+            narrative of a person&apos;s life using their natal chart.
+          </p>
+
+          {/* Key concept box */}
+          <div
+            className="terminal-card"
+            style={{
+              padding: '1rem',
+              marginBottom: '1.25rem',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)',
+            }}
+          >
+            <p style={{ color: 'var(--tier-transcendent)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+              KEY CONCEPT
+            </p>
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.875rem', lineHeight: 1.7 }}>
+              Unlike planetary hours (which are the same for everyone in your city) and personal numerology
+              (which is derived from your birth <em>date</em>), Zodiacal Releasing is calculated from your
+              exact <strong style={{ color: 'var(--tier-transcendent)' }}>birth time and birth location</strong>.
+              It produces a completely unique timeline for each person, based on the precise positions of the
+              Sun, Moon, and Ascendant at the moment of birth.
+            </p>
+          </div>
+
+          {/* Hellenistic origins */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            Hellenistic Origins
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+            Zodiacal Releasing was practiced by astrologers in the Greco-Roman world over 1,800 years ago.
+            Vettius Valens documented it in his <em>Anthology</em>, a nine-book compendium of astrological
+            techniques. The method was largely lost for centuries until modern scholars of Hellenistic
+            astrology &mdash; particularly Robert Schmidt, Chris Brennan, and others &mdash; translated
+            the original Greek texts and revived the technique. Today, ZR is experiencing a renaissance
+            among traditional astrologers who find it to be one of the most reliable predictive tools
+            available.
+          </p>
+
+          {/* The Lot of Fortune */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            The Lot of Fortune
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+            The starting point for Zodiacal Releasing is the <strong style={{ color: 'var(--text-primary)' }}>Lot of Fortune</strong> (also
+            called the Part of Fortune). This is a mathematically derived point in your natal chart:
+          </p>
+
+          <div
+            style={{
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '6px',
+              padding: '1rem',
+              marginBottom: '1.25rem',
+              fontFamily: 'monospace',
+              fontSize: '0.85rem',
+            }}
+          >
+            <p style={{ color: 'var(--accent-amber)', fontWeight: 600, marginBottom: '0.5rem' }}>FORMULA</p>
+            <p style={{ color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+              <strong>Day chart:</strong> Lot = Ascendant + Moon &minus; Sun
+            </p>
+            <p style={{ color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
+              <strong>Night chart:</strong> Lot = Ascendant + Sun &minus; Moon
+            </p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.5 }}>
+              The Ascendant is the degree of the zodiac rising on the eastern horizon at the moment of birth.
+              A &quot;day chart&quot; means the Sun was above the horizon (you were born during the day); a
+              &quot;night chart&quot; means it was below (born at night). The result is a specific degree that
+              falls in one of the 12 zodiac signs &mdash; that sign becomes the foundation of your ZR timeline.
+            </p>
+          </div>
+
+          {/* Why birth time matters */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            Why Birth Time Matters
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>
+            The Ascendant changes approximately every 2 hours as the Earth rotates. Even a 30-minute
+            difference in birth time can shift the Ascendant &mdash; and therefore the Lot of Fortune &mdash;
+            into a different sign, which would produce an entirely different ZR timeline. This is why
+            your birth certificate time is important. The more accurate your birth time, the more
+            accurate your Zodiacal Releasing periods.
+          </p>
+
+          {/* The Four Levels */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            The Four Levels (L1&ndash;L4)
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+            From the Lot of Fortune sign, ZR generates a cascading hierarchy of time periods. Each zodiac
+            sign has a specific &quot;minor years&quot; value (inherited from Hellenistic tradition), which
+            determines how long each sign&apos;s period lasts at each level:
+          </p>
+
+          <div style={{ overflowX: 'auto', marginBottom: '1.25rem' }}>
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '0.8rem',
+              }}
+            >
+              <thead>
+                <tr>
+                  {['Sign', 'Minor Years', 'Ruler'].map((h) => (
+                    <th
+                      key={h}
+                      style={{
+                        textAlign: 'left',
+                        padding: '0.5rem 0.75rem',
+                        color: 'var(--text-secondary)',
+                        borderBottom: '1px solid var(--border-color)',
+                        fontWeight: 600,
+                        textTransform: 'uppercase' as const,
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { sign: '♈ Aries', years: 15, ruler: 'Mars' },
+                  { sign: '♉ Taurus', years: 8, ruler: 'Venus' },
+                  { sign: '♊ Gemini', years: 20, ruler: 'Mercury' },
+                  { sign: '♋ Cancer', years: 25, ruler: 'Moon' },
+                  { sign: '♌ Leo', years: 19, ruler: 'Sun' },
+                  { sign: '♍ Virgo', years: 20, ruler: 'Mercury' },
+                  { sign: '♎ Libra', years: 8, ruler: 'Venus' },
+                  { sign: '♏ Scorpio', years: 15, ruler: 'Mars' },
+                  { sign: '♐ Sagittarius', years: 12, ruler: 'Jupiter' },
+                  { sign: '♑ Capricorn', years: 27, ruler: 'Saturn' },
+                  { sign: '♒ Aquarius', years: 27, ruler: 'Saturn' },
+                  { sign: '♓ Pisces', years: 12, ruler: 'Jupiter' },
+                ].map((row) => (
+                  <tr key={row.sign}>
+                    <td style={{ padding: '0.375rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)', fontWeight: 600 }}>
+                      {row.sign}
+                    </td>
+                    <td style={{ padding: '0.375rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--accent-cyan)', fontWeight: 600 }}>
+                      {row.years}
+                    </td>
+                    <td style={{ padding: '0.375rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                      {row.ruler}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+            The total of all 12 signs&apos; minor years is <strong style={{ color: 'var(--accent-cyan)' }}>129</strong>.
+            At L1, each sign&apos;s period lasts its full minor years value (e.g., if your Lot of Fortune is
+            in Cancer, your first L1 period is 25 years). Within each L1, the 12 signs cycle again at L2
+            but proportionally shorter. This continues to L3 and finally L4, where periods can last just
+            hours &mdash; giving us the fine-grained resolution Supreme Alignment needs.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
+            {[
+              { level: 'L1', name: 'Major Period', example: '8–27 years per sign', color: 'var(--accent-purple)' },
+              { level: 'L2', name: 'Sub-Period', example: 'Months to a few years', color: 'var(--accent-cyan)' },
+              { level: 'L3', name: 'Sub-Sub-Period', example: 'Days to weeks', color: 'var(--accent-amber)' },
+              { level: 'L4', name: 'Micro-Period', example: 'Hours to days', color: 'var(--tier-transcendent)' },
+            ].map((l) => (
+              <div
+                key={l.level}
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  padding: '0.625rem 1rem',
+                  borderLeft: `3px solid ${l.color}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                }}
+              >
+                <span style={{ fontWeight: 700, color: l.color, fontSize: '0.95rem', minWidth: '2rem' }}>{l.level}</span>
+                <div>
+                  <span style={{ fontWeight: 600, color: 'var(--text-primary)', fontSize: '0.85rem' }}>{l.name}</span>
+                  <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}> — {l.example}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* The Planetary Ruler Connection */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            The Planetary Ruler Connection
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+            Every zodiac sign is ruled by one of the 7 classical planets. When you&apos;re in a ZR L4
+            micro-period ruled by Leo, for example, the ruling planet is the Sun. If the current planetary
+            hour also happens to be a Sun hour, your birth chart&apos;s time-lord and the cosmic clock are
+            in agreement &mdash; that&apos;s a <strong style={{ color: 'var(--tier-transcendent)' }}>ZR alignment</strong>.
+          </p>
+
+          <div
+            className="terminal-card"
+            style={{
+              padding: '1rem',
+              marginBottom: '1.25rem',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border-color)',
+            }}
+          >
+            <p style={{ color: 'var(--accent-amber)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+              EXAMPLE
+            </p>
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.875rem', lineHeight: 1.8 }}>
+              Your Lot of Fortune is in Taurus. Right now your ZR L4 micro-period is in{' '}
+              <strong style={{ color: 'var(--accent-amber)' }}>Leo</strong> (ruled by the{' '}
+              <strong style={{ color: 'var(--accent-amber)' }}>Sun</strong>).
+              <br />
+              The current planetary hour is a <strong style={{ color: 'var(--accent-amber)' }}>Sun hour</strong>.
+              <br />
+              <span style={{ color: 'var(--tier-transcendent)' }}>&rarr; ZR alignment is active.</span> Your
+              birth chart&apos;s time-lord confirms this planetary hour as personally significant to you.
+            </p>
+          </div>
+
+          {/* Peak and Trough */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            Peak Periods &amp; Troughs
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+            Within ZR, the angular relationship between your L2 (sub-period) sign and your L1 (major period)
+            sign creates seasons of momentum:
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', gap: '0.75rem', padding: '0.625rem 0.75rem', background: 'var(--bg-tertiary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+              <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: '0.85rem' }}>PEAK</span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Conjunction, trine, or sextile (0, 4, or 2 signs apart) &mdash; heightened productivity, opportunity, and forward momentum.</span>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', padding: '0.625rem 0.75rem', background: 'var(--bg-tertiary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+              <span style={{ color: 'var(--accent-pink)', fontWeight: 700, fontSize: '0.85rem' }}>TROUGH</span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Square or opposition (3 or 6 signs apart) &mdash; challenges, restructuring, and inward focus.</span>
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', padding: '0.625rem 0.75rem', background: 'var(--bg-tertiary)', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
+              <span style={{ color: 'var(--text-secondary)', fontWeight: 700, fontSize: '0.85rem' }}>NEUTRAL</span>
+              <span style={{ color: 'var(--text-secondary)', fontSize: '0.8rem' }}>Other angular relationships &mdash; neither strongly accelerated nor challenged.</span>
+            </div>
+          </div>
+
+          {/* Loosing of the Bond */}
+          <h3
+            style={{
+              fontSize: '1rem',
+              fontWeight: 600,
+              color: 'var(--accent-purple)',
+              marginBottom: '0.75rem',
+            }}
+          >
+            Loosing of the Bond
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7 }}>
+            A special condition in ZR that occurs when the L2 sub-period sign is directly opposite your Lot
+            of Fortune&apos;s natal sign (6 signs away). This signals a major transition or turning
+            point &mdash; the narrative of your life is &quot;loosing&quot; (releasing) its bond with the
+            current major period and reaching toward the next chapter. In traditional Hellenistic practice,
+            this was considered one of the most significant timing indicators in a person&apos;s life.
+            When active, it&apos;s shown on your dashboard&apos;s ZR panel.
+          </p>
+        </section>
+
+        {/* ============================================ */}
+        {/* SECTION 4: How They Work Together */}
         {/* ============================================ */}
         <section className="terminal-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
           <h2
@@ -614,22 +954,23 @@ export default function LearnPage() {
               marginBottom: '1rem',
             }}
           >
-            3. How They Work Together
+            4. How They All Work Together
           </h2>
 
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '1rem' }}>
-            Supreme Alignment cross-references these two independent timing systems &mdash; the external
-            planetary hour cycle and your internal personal numerology cycle &mdash; to find moments when both
-            are synchronized around the same life theme.
+            Supreme Alignment cross-references three independent timing systems &mdash; planetary hours,
+            personal numerology, and Zodiacal Releasing &mdash; to find moments when multiple layers of
+            cosmic and personal timing converge on the same life theme.
           </p>
 
           <div
             style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr auto 1fr',
-              gap: '1rem',
+              display: 'flex',
+              gap: '0.75rem',
               alignItems: 'center',
               marginBottom: '1rem',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
             }}
           >
             <div
@@ -637,31 +978,54 @@ export default function LearnPage() {
                 background: 'var(--bg-tertiary)',
                 border: '1px solid var(--border-color)',
                 borderRadius: '6px',
-                padding: '1rem',
+                padding: '0.75rem 1rem',
                 textAlign: 'center',
+                flex: '1',
+                minWidth: '140px',
               }}
             >
-              <div style={{ color: 'var(--accent-amber)', fontWeight: 700, fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+              <div style={{ color: 'var(--accent-amber)', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.25rem' }}>
                 Planetary Hour
               </div>
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>External cosmic timing</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem' }}>External cosmic timing</div>
             </div>
 
-            <div style={{ color: 'var(--accent-green)', fontSize: '1.25rem', fontWeight: 700 }}>&times;</div>
+            <div style={{ color: 'var(--accent-green)', fontSize: '1.1rem', fontWeight: 700 }}>&times;</div>
 
             <div
               style={{
                 background: 'var(--bg-tertiary)',
                 border: '1px solid var(--border-color)',
                 borderRadius: '6px',
-                padding: '1rem',
+                padding: '0.75rem 1rem',
                 textAlign: 'center',
+                flex: '1',
+                minWidth: '140px',
               }}
             >
-              <div style={{ color: 'var(--accent-purple)', fontWeight: 700, fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+              <div style={{ color: 'var(--accent-purple)', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.25rem' }}>
                 Personal Numerology
               </div>
-              <div style={{ color: 'var(--text-secondary)', fontSize: '0.75rem' }}>Internal personal cycle</div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem' }}>Internal personal cycle</div>
+            </div>
+
+            <div style={{ color: 'var(--accent-green)', fontSize: '1.1rem', fontWeight: 700 }}>&times;</div>
+
+            <div
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)',
+                borderRadius: '6px',
+                padding: '0.75rem 1rem',
+                textAlign: 'center',
+                flex: '1',
+                minWidth: '140px',
+              }}
+            >
+              <div style={{ color: 'var(--tier-transcendent)', fontWeight: 700, fontSize: '0.85rem', marginBottom: '0.25rem' }}>
+                Zodiacal Releasing
+              </div>
+              <div style={{ color: 'var(--text-secondary)', fontSize: '0.7rem' }}>Birth chart time-lord</div>
             </div>
           </div>
 
@@ -675,10 +1039,10 @@ export default function LearnPage() {
             }}
           >
             <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: '0.875rem' }}>
-              = Alignment Window
+              = Alignment Window (up to 5 layers deep)
             </span>
             <span style={{ color: 'var(--text-secondary)', fontSize: '0.75rem', display: 'block', marginTop: '0.25rem' }}>
-              When both systems resonate with the same theme, you&apos;re in flow.
+              More layers converging = rarer and more powerful alignment. When all five agree, it&apos;s Transcendent.
             </span>
           </div>
         </section>
