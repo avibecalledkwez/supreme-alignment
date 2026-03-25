@@ -9,6 +9,12 @@ export default function SettingsPage() {
   const [city, setCity] = useState('')
   const [currentCity, setCurrentCity] = useState('')
   const [firstName, setFirstName] = useState('')
+  const [birthTime, setBirthTime] = useState('')
+  const [birthCity, setBirthCity] = useState('')
+  const [originalBirthTime, setOriginalBirthTime] = useState('')
+  const [originalBirthCity, setOriginalBirthCity] = useState('')
+  const [savingBirth, setSavingBirth] = useState(false)
+  const [birthMessage, setBirthMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -35,6 +41,10 @@ export default function SettingsPage() {
         setFirstName(profile.first_name)
         setCurrentCity(profile.city)
         setCity(profile.city)
+        setBirthTime(profile.birth_time || '')
+        setBirthCity(profile.birth_city || '')
+        setOriginalBirthTime(profile.birth_time || '')
+        setOriginalBirthCity(profile.birth_city || '')
       }
     }
     loadProfile()
@@ -126,6 +136,100 @@ export default function SettingsPage() {
           <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
             Current location: {currentCity}
           </p>
+        </div>
+
+        {/* Birth Data for Zodiacal Releasing */}
+        {!originalBirthTime && !originalBirthCity && (
+          <div className="mb-4 p-3 rounded" style={{ background: 'rgba(245,158,11,0.05)', border: '1px solid rgba(245,158,11,0.2)' }}>
+            <p className="text-xs" style={{ color: 'var(--accent-amber)' }}>
+              Add your birth time &amp; birth city below to unlock Zodiacal Releasing on your dashboard.
+            </p>
+          </div>
+        )}
+        <div className="mb-6">
+          <label className="block text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--text-secondary)' }}>
+            Birth Time &amp; City (for Zodiacal Releasing)
+          </label>
+          <div className="space-y-3">
+            <div>
+              <input
+                type="time"
+                value={birthTime}
+                onChange={(e) => setBirthTime(e.target.value)}
+                className="w-full"
+                style={{ padding: '8px 10px' }}
+              />
+              <p className="text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+                Birth time from your birth certificate (24h format)
+              </p>
+            </div>
+            <div>
+              <input
+                type="text"
+                value={birthCity}
+                onChange={(e) => setBirthCity(e.target.value)}
+                className="w-full"
+                placeholder="City where you were born"
+              />
+            </div>
+            <button
+              onClick={async () => {
+                if (!birthTime || !birthCity.trim()) {
+                  setError('Both birth time and birth city are required.')
+                  return
+                }
+                setSavingBirth(true)
+                setBirthMessage('')
+                setError('')
+
+                try {
+                  const geoRes = await fetch(`/api/geocode?q=${encodeURIComponent(birthCity.trim())}`)
+                  const geoData = await geoRes.json()
+                  if (geoData.error) {
+                    setError('Could not find that birth city.')
+                    setSavingBirth(false)
+                    return
+                  }
+
+                  const { data: { user } } = await supabase.auth.getUser()
+                  if (!user) return
+
+                  const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({
+                      birth_time: birthTime,
+                      birth_city: geoData.formatted || birthCity.trim(),
+                      birth_latitude: geoData.latitude,
+                      birth_longitude: geoData.longitude,
+                    })
+                    .eq('id', user.id)
+
+                  if (updateError) {
+                    setError(updateError.message)
+                  } else {
+                    setOriginalBirthTime(birthTime)
+                    setOriginalBirthCity(birthCity.trim())
+                    setBirthMessage('Birth data saved. Zodiacal Releasing is now active on your dashboard.')
+                  }
+                } catch {
+                  setError('Failed to save birth data.')
+                }
+                setSavingBirth(false)
+              }}
+              disabled={savingBirth || (birthTime === originalBirthTime && birthCity.trim() === originalBirthCity)}
+              className="w-full py-2 rounded-lg text-sm font-semibold uppercase"
+              style={{
+                background: 'var(--accent-purple)',
+                color: 'var(--bg-primary)',
+                opacity: savingBirth || (birthTime === originalBirthTime && birthCity.trim() === originalBirthCity) ? 0.5 : 1,
+              }}
+            >
+              {savingBirth ? 'SAVING...' : 'SAVE BIRTH DATA'}
+            </button>
+            {birthMessage && (
+              <p className="text-xs" style={{ color: 'var(--accent-green)' }}>{birthMessage}</p>
+            )}
+          </div>
         </div>
 
         {/* Update City */}

@@ -12,8 +12,11 @@ import {
 } from '@/lib/planetary-hours'
 import { calculateNumerology, calculateAllPersonalHours, personalYear, personalMonth as calcPersonalMonth } from '@/lib/numerology'
 import { findAlignments, type Alignment, type AlignmentTier } from '@/lib/alignment-engine'
+import { calculateNatalChart } from '@/lib/natal-chart'
+import { calculateZRState, checkZRAlignment, type ZRState } from '@/lib/zodiacal-releasing'
 import Link from 'next/link'
 import ThemeToggle from './ThemeToggle'
+import ZRPanel from './ZRPanel'
 
 interface NavLink {
   href: string
@@ -27,6 +30,10 @@ interface UserProfile {
   city: string
   latitude: number
   longitude: number
+  birth_time?: string | null
+  birth_city?: string | null
+  birth_latitude?: number | null
+  birth_longitude?: number | null
 }
 
 interface TimelineEntry {
@@ -115,6 +122,8 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
   const [sunTimes, setSunTimes] = useState<{ sunrise: Date; sunset: Date } | null>(null)
   const [expandedAlignment, setExpandedAlignment] = useState<string | null>(null)
   const [countdown, setCountdown] = useState('')
+  const [zrState, setZrState] = useState<ZRState | null>(null)
+  const [zrAligned, setZrAligned] = useState(false)
 
   const dataRef = useRef<{
     nextAlignment: typeof nextAlignment
@@ -256,7 +265,35 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       setNextAlignment(null)
       dataRef.current.nextAlignment = null
     }
-  }, [lat, lon, birthMonth, birthDay, selectedDate, isViewingToday, activeAlignments.length])
+
+    // Calculate Zodiacal Releasing if birth data available
+    if (profile.birth_time && profile.birth_latitude != null && profile.birth_longitude != null) {
+      const [bHour, bMinute] = profile.birth_time.split(':').map(Number)
+      const natal = calculateNatalChart({
+        birthYear: parseInt(birthParts[0], 10),
+        birthMonth,
+        birthDay,
+        birthHour: bHour,
+        birthMinute: bMinute,
+        birthLat: profile.birth_latitude,
+        birthLng: profile.birth_longitude,
+      })
+      const birthDate = new Date(
+        parseInt(birthParts[0], 10), birthMonth - 1, birthDay,
+        bHour, bMinute
+      )
+      const zr = calculateZRState(natal.lotOfFortuneSignIndex, birthDate, currentTime)
+      setZrState(zr)
+      if (zr && current) {
+        setZrAligned(checkZRAlignment(zr.l4.ruler, current.planet))
+      } else {
+        setZrAligned(false)
+      }
+    } else {
+      setZrState(null)
+      setZrAligned(false)
+    }
+  }, [lat, lon, birthMonth, birthDay, selectedDate, isViewingToday, activeAlignments.length, profile.birth_time, profile.birth_latitude, profile.birth_longitude])
 
   useEffect(() => {
     if (!selectedDate) return
@@ -589,6 +626,15 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
             <span className="text-xs" style={{ color: 'var(--tier-super)' }}>👑 Super Supreme — Planet + Hour + Day + Month energy aligned</span>
           </div>
         </div>
+      </div>
+
+      {/* Zodiacal Releasing Panel */}
+      <div className="mb-6">
+        <ZRPanel
+          zrState={zrState}
+          zrAligned={zrAligned}
+          hasBirthData={!!(profile.birth_time && profile.birth_latitude != null)}
+        />
       </div>
 
       {/* 24-Hour Timeline */}

@@ -10,6 +10,8 @@ export default function SignupPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [dob, setDob] = useState('')
+  const [birthTime, setBirthTime] = useState('')
+  const [birthCity, setBirthCity] = useState('')
   const [city, setCity] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -88,6 +90,8 @@ export default function SignupPage() {
           city: formattedCity,
           latitude,
           longitude,
+          birth_time: birthTime || null,
+          birth_city: birthCity.trim() || null,
         },
       },
     })
@@ -96,6 +100,20 @@ export default function SignupPage() {
       setError(authError.message)
       setLoading(false)
       return
+    }
+
+    // Geocode birth city if provided
+    let birthLatitude: number | null = null
+    let birthLongitude: number | null = null
+    if (birthCity.trim()) {
+      try {
+        const birthGeoRes = await fetch(`/api/geocode?q=${encodeURIComponent(birthCity.trim())}`)
+        const birthGeoData = await birthGeoRes.json()
+        if (!birthGeoData.error) {
+          birthLatitude = birthGeoData.latitude
+          birthLongitude = birthGeoData.longitude
+        }
+      } catch { /* optional field, don't block signup */ }
     }
 
     // Insert profile
@@ -107,6 +125,10 @@ export default function SignupPage() {
         city: formattedCity,
         latitude,
         longitude,
+        birth_time: birthTime || null,
+        birth_city: birthCity.trim() || null,
+        birth_latitude: birthLatitude,
+        birth_longitude: birthLongitude,
       })
     }
 
@@ -211,6 +233,37 @@ export default function SignupPage() {
               required
               className="w-full"
             />
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--text-secondary)' }}>
+              Birth Time (24h)
+            </label>
+            <input
+              type="time"
+              value={birthTime}
+              onChange={(e) => setBirthTime(e.target.value)}
+              className="w-full"
+            />
+            <p className="text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+              Required for Zodiacal Releasing. Check your birth certificate.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-xs uppercase tracking-wider mb-2" style={{ color: 'var(--text-secondary)' }}>
+              Birth City
+            </label>
+            <input
+              type="text"
+              value={birthCity}
+              onChange={(e) => setBirthCity(e.target.value)}
+              className="w-full"
+              placeholder="City where you were born"
+            />
+            <p className="text-[10px] mt-1" style={{ color: 'var(--text-secondary)' }}>
+              Used with birth time to calculate your natal chart.
+            </p>
           </div>
 
           <div>
