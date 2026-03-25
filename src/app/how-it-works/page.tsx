@@ -496,10 +496,10 @@ export default function HowItWorksPage() {
 
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
                 The rarest and most powerful alignment possible. All four numerological layers AND your natal
-                chart&apos;s Zodiacal Releasing time-lord are synchronized. Your birth chart literally encoded this
-                moment into your timeline. When five independent timing systems &mdash; planetary hour, personal
-                hour, personal day, personal month, and your ZR L4 period ruler &mdash; all converge on the
-                same theme, you are in a fated window. Act with absolute conviction.
+                chart&apos;s Zodiacal Releasing Lots are synchronized. Supreme Alignment checks the relevant
+                Lots for each theme &mdash; when those Lots have benefic L4 rulers, or when a Cosmic
+                Convergence (3+ Lots benefic) is active, the alignment reaches Transcendent. Five independent
+                timing systems all pointing the same direction. Act with absolute conviction.
               </p>
 
               <div
@@ -515,8 +515,8 @@ export default function HowItWorksPage() {
                 }}
               >
                 <strong style={{ color: 'var(--tier-transcendent)' }}>Requires birth time:</strong> Transcendent
-                alignments use Zodiacal Releasing, which requires your exact birth time and birth city. Add
-                these in Settings to unlock this tier.
+                alignments use Zodiacal Releasing from four Lots (Fortune, Spirit, Eros, Victory), which require
+                your exact birth time and birth city. Add these in Settings to unlock this tier.
               </div>
             </div>
           </div>
@@ -604,7 +604,7 @@ export default function HowItWorksPage() {
                   </td>
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>5</td>
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
-                    Planet + Hour + Day + Month + ZR L4 Ruler
+                    Planet + Hour + Day + Month + Benefic ZR Lot(s)
                   </td>
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
                     Extremely rare — once a year or less
@@ -627,95 +627,216 @@ export default function HowItWorksPage() {
               marginBottom: '1rem',
             }}
           >
-            3. Zodiacal Releasing &amp; The Transcendent Tier
+            3. Zodiacal Releasing &amp; The Four Lots
           </h2>
 
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>
             Zodiacal Releasing (ZR) is a Hellenistic time-lord technique that divides your entire life into
-            cascading periods, each ruled by a zodiac sign and its planetary ruler. It adds a deeply personal,
-            birth-chart-based layer to your alignment calculations &mdash; the fifth and final layer that
-            unlocks the Transcendent tier.
+            cascading periods, each ruled by a zodiac sign and its planetary ruler. Supreme Alignment calculates
+            ZR from <strong style={{ color: 'var(--text-primary)' }}>four different Lots</strong>, each governing
+            a different life domain. Together they create a comprehensive &ldquo;life weather report&rdquo;
+            that feeds into the Transcendent tier.
           </p>
 
-          {/* How ZR works */}
-          <h3
-            style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--accent-purple)',
-              marginBottom: '0.75rem',
-            }}
-          >
-            How Zodiacal Releasing Works
+          {/* The Four Lots */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
+            The Four Lots
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
-            <div
-              style={{
-                background: 'var(--bg-tertiary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                padding: '0.75rem 1rem',
-                borderLeft: '3px solid var(--tier-transcendent)',
-              }}
-            >
-              <div style={{ fontWeight: 700, color: 'var(--tier-transcendent)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
-                The Lot of Fortune
+            {[
+              { icon: '🏦', name: 'Lot of Fortune', domain: 'Material & Health', formula: 'Day: Asc + Moon − Sun / Night: Asc + Sun − Moon', color: 'var(--accent-green)', desc: 'The most foundational Lot. Governs your body, material circumstances, livelihood, and physical well-being. Fortune describes what happens to you — the circumstances of your life.' },
+              { icon: '🧠', name: 'Lot of Spirit', domain: 'Career & Purpose', formula: 'Day: Asc + Sun − Moon / Night: Asc + Moon − Sun', color: 'var(--accent-cyan)', desc: 'The reverse of Fortune. Spirit governs your mind, willpower, career actions, and sense of purpose. Where Fortune is what happens to you, Spirit is what you do about it — your agency and drive.' },
+              { icon: '💜', name: 'Lot of Eros', domain: 'Love & Desire', formula: 'Day: Asc + Venus − Spirit / Night: Asc + Spirit − Venus', color: 'var(--accent-pink)', desc: 'Calculated from Venus and Spirit. Eros governs desire, romantic love, passion, and what you are drawn to. It reveals the timing of attraction, deepening connections, and heart-centered experiences.' },
+              { icon: '🏆', name: 'Lot of Victory', domain: 'Achievement', formula: 'Day: Asc + Jupiter − Spirit / Night: Asc + Spirit − Jupiter', color: 'var(--accent-amber)', desc: 'Calculated from Jupiter and Spirit. Victory governs competition, professional achievement, recognition, and success in endeavors. It reveals windows of triumph and public accomplishment.' },
+            ].map((lot) => (
+              <div
+                key={lot.name}
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  padding: '0.75rem 1rem',
+                  borderLeft: `3px solid ${lot.color}`,
+                }}
+              >
+                <div style={{ fontWeight: 700, color: lot.color, fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                  {lot.icon} {lot.name} <span style={{ fontWeight: 400, color: 'var(--text-secondary)', fontSize: '0.75rem' }}>— {lot.domain}</span>
+                </div>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.375rem' }}>
+                  {lot.desc}
+                </p>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.7rem', fontFamily: 'monospace' }}>
+                  {lot.formula}
+                </p>
               </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
-                ZR begins with the <strong style={{ color: 'var(--text-primary)' }}>Lot of Fortune</strong> &mdash;
-                a sensitive point in your natal chart calculated from the positions of your Sun, Moon, and
-                Ascendant at the exact moment and location of your birth. The zodiac sign where your Lot of
-                Fortune falls becomes the starting point of your ZR timeline. This is why birth time and birth
-                city are required.
-              </p>
-            </div>
-
-            <div
-              style={{
-                background: 'var(--bg-tertiary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                padding: '0.75rem 1rem',
-                borderLeft: '3px solid var(--accent-purple)',
-              }}
-            >
-              <div style={{ fontWeight: 700, color: 'var(--accent-purple)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
-                Four Levels of Time Periods
-              </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.5rem' }}>
-                From the Lot of Fortune sign, ZR generates four nested levels of time periods, each subdividing
-                the one above it:
-              </p>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem' }}>
-                {[
-                  { level: 'L1', name: 'Major Period', duration: 'Years to decades', desc: 'The broadest life chapter. Sets the overarching theme of an entire era of your life.' },
-                  { level: 'L2', name: 'Sub-Period', duration: 'Months to years', desc: 'Subdivisions within the major period. These shift the focus within the larger theme.' },
-                  { level: 'L3', name: 'Sub-Sub-Period', duration: 'Weeks to months', desc: 'Finer timing within each sub-period. Weekly and monthly rhythms become visible here.' },
-                  { level: 'L4', name: 'Micro-Period', duration: 'Hours to days', desc: 'The finest resolution. Each L4 period is ruled by a sign and its planetary ruler — this is the ruler that Supreme Alignment checks against the current planetary hour.' },
-                ].map((l) => (
-                  <div key={l.level} style={{ display: 'flex', gap: '0.5rem', fontSize: '0.8rem', padding: '0.375rem 0.5rem', background: 'var(--bg-primary)', borderRadius: '4px' }}>
-                    <span style={{ color: 'var(--tier-transcendent)', fontWeight: 700, minWidth: '2rem' }}>{l.level}</span>
-                    <div>
-                      <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{l.name}</span>
-                      <span style={{ color: 'var(--text-secondary)' }}> ({l.duration})</span>
-                      <span style={{ color: 'var(--text-secondary)' }}> — {l.desc}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* How ZR creates Transcendent */}
-          <h3
+          <div
             style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--accent-purple)',
-              marginBottom: '0.75rem',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border-color)',
+              borderRadius: '6px',
+              padding: '0.75rem 1rem',
+              marginBottom: '1.25rem',
+              borderLeft: '3px solid var(--accent-purple)',
             }}
           >
+            <div style={{ fontWeight: 700, color: 'var(--accent-purple)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+              How They Connect
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+              Spirit is the reverse of Fortune (swap Sun and Moon). Eros and Victory both depend on Spirit&apos;s
+              position — they use it as an input alongside Venus (for Eros) or Jupiter (for Victory). So the
+              calculation chain is: <strong style={{ color: 'var(--text-primary)' }}>Fortune → Spirit → Eros &amp; Victory</strong>.
+              All four require your exact birth time and birth city because they depend on the Ascendant.
+            </p>
+          </div>
+
+          {/* Four Levels of Time */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
+            Four Levels of Time Periods
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.75rem' }}>
+            Each Lot generates its own independent ZR timeline with four nested levels:
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.375rem', marginBottom: '1.25rem' }}>
+            {[
+              { level: 'L1', name: 'Major Period', duration: 'Years to decades', desc: 'The broadest life chapter. Sets the overarching theme of an entire era.' },
+              { level: 'L2', name: 'Sub-Period', duration: 'Months to years', desc: 'Subdivisions within the major period, shifting focus within the larger theme.' },
+              { level: 'L3', name: 'Sub-Sub-Period', duration: 'Weeks to months', desc: 'Finer timing. Weekly and monthly rhythms become visible here.' },
+              { level: 'L4', name: 'Micro-Period', duration: 'Hours to days', desc: 'The finest resolution. The L4 ruler is the planet that Supreme Alignment evaluates for prosperity and alignment.' },
+            ].map((l) => (
+              <div key={l.level} style={{ display: 'flex', gap: '0.5rem', fontSize: '0.8rem', padding: '0.375rem 0.5rem', background: 'var(--bg-tertiary)', borderRadius: '4px' }}>
+                <span style={{ color: 'var(--tier-transcendent)', fontWeight: 700, minWidth: '2rem' }}>{l.level}</span>
+                <div>
+                  <span style={{ color: 'var(--text-primary)', fontWeight: 600 }}>{l.name}</span>
+                  <span style={{ color: 'var(--text-secondary)' }}> ({l.duration})</span>
+                  <span style={{ color: 'var(--text-secondary)' }}> — {l.desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Benefic/Malefic Classification */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
+            Prosperity Classification
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.75rem' }}>
+            For each Lot, the L4 micro-period ruler determines the prosperity level of that life domain right now.
+            The classification follows the traditional Hellenistic benefic/malefic system, softened for practical use:
+          </p>
+
+          <div style={{ overflowX: 'auto', marginBottom: '1.25rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+              <thead>
+                <tr>
+                  {['Planet Nature', 'Planets', 'Prosperity', 'Meaning'].map((h) => (
+                    <th key={h} style={{ textAlign: 'left', padding: '0.5rem 0.75rem', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontSize: '0.7rem' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--accent-green)', fontWeight: 600 }}>Benefic</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>Venus, Jupiter</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--accent-green)', fontWeight: 600 }}>Prosperous</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>Highly favorable. The domain is supported by expansive, harmonious energy.</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--accent-amber)', fontWeight: 600 }}>Mildly Benefic</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>Sun, Moon</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--accent-amber)', fontWeight: 600 }}>Favorable</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>Positive conditions. The luminaries bring vitality and emotional support.</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontWeight: 600 }}>Neutral</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>Mercury</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontWeight: 600 }}>Variable</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>Context-dependent. Mercury adapts to what surrounds it.</td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: '#ef4444', fontWeight: 600 }}>Malefic</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>Mars, Saturn</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: '#ef4444', fontWeight: 600 }}>Challenging</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>Demands caution and discipline. Not inherently bad, but requires more effort.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          {/* Cosmic Convergence */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--tier-transcendent)', marginBottom: '0.75rem' }}>
+            Cosmic Convergence
+          </h3>
+
+          <div
+            style={{
+              background: 'var(--bg-tertiary)',
+              border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)',
+              borderRadius: '6px',
+              padding: '0.75rem 1rem',
+              marginBottom: '1.25rem',
+              borderLeft: '3px solid var(--tier-transcendent)',
+            }}
+          >
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.5rem' }}>
+              When <strong style={{ color: 'var(--tier-transcendent)' }}>3 or more of the 4 Lots</strong> have
+              benefic or mildly-benefic L4 rulers simultaneously, a{' '}
+              <strong style={{ color: 'var(--tier-transcendent)' }}>Cosmic Convergence</strong> is active.
+              This is a universally prosperous moment across multiple life domains. The convergence score
+              (0&ndash;4) is shown on your dashboard&apos;s ZR panel.
+            </p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+              During Cosmic Convergence, ALL alignment themes can qualify for the Transcendent tier
+              (when the numerological layers are also aligned), because the overwhelming benefic energy
+              spills across all domains.
+            </p>
+          </div>
+
+          {/* Theme-to-Lot Mapping */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
+            How Lots Map to Alignment Themes
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.75rem' }}>
+            Each alignment theme is linked to the Lots most relevant to its domain. When the relevant Lot(s) have
+            benefic L4 rulers, that theme becomes eligible for the Transcendent tier:
+          </p>
+
+          <div style={{ overflowX: 'auto', marginBottom: '1.25rem' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem' }}>
+              <thead>
+                <tr>
+                  {['Theme', 'Relevant Lots', 'Why'].map((h) => (
+                    <th key={h} style={{ textAlign: 'left', padding: '0.5rem 0.75rem', color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-color)', fontWeight: 600, textTransform: 'uppercase' as const, letterSpacing: '0.05em', fontSize: '0.7rem' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { theme: '💰 Financial', lots: 'Victory + Spirit', why: 'Achievement energy + career purpose drive financial outcomes', color: '#10B981' },
+                  { theme: '💜 Love', lots: 'Eros + Fortune', why: 'Desire/attraction + material circumstances shape relationships', color: '#EC4899' },
+                  { theme: '⚡ Health', lots: 'Fortune + Victory', why: 'Body/material well-being + vitality of achievement', color: '#F59E0B' },
+                  { theme: '✨ Creativity', lots: 'Spirit + Eros', why: 'Purpose/agency + passion fuel creative expression', color: '#8B5CF6' },
+                  { theme: '🔮 Spiritual', lots: 'Spirit + Fortune', why: 'Mind/purpose + body/material create holistic transcendence', color: '#6366F1' },
+                ].map((row) => (
+                  <tr key={row.theme}>
+                    <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: row.color, fontWeight: 600 }}>{row.theme}</td>
+                    <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>{row.lots}</td>
+                    <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>{row.why}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Transcendent condition */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
             How ZR Unlocks the Transcendent Tier
           </h3>
 
@@ -733,107 +854,59 @@ export default function HowItWorksPage() {
             </p>
             <p style={{ color: 'var(--text-primary)', fontSize: '0.875rem', lineHeight: 1.7 }}>
               When you already have a <strong>Super Supreme</strong> alignment (planet + hour + day + month all
-              matching), and <em>additionally</em> your ZR L4 micro-period&apos;s ruling planet matches the
-              current planetary hour &mdash; that alignment is promoted to{' '}
-              <strong style={{ color: 'var(--tier-transcendent)' }}>Transcendent</strong>. Five independent
-              timing systems are all pointing in the same direction at the same moment. Your birth chart
-              literally scheduled this window.
+              matching), and <em>additionally</em> the relevant Lot(s) for that theme have benefic or
+              mildly-benefic L4 rulers &mdash; OR a Cosmic Convergence is active &mdash; the alignment
+              is promoted to <strong style={{ color: 'var(--tier-transcendent)' }}>Transcendent</strong>.
+              Your birth chart&apos;s time-lord system confirms that this domain is in a prosperous period,
+              making the convergence of all five timing layers complete.
             </p>
           </div>
 
           {/* Peak, Trough, Loosing of the Bond */}
-          <h3
-            style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--accent-purple)',
-              marginBottom: '0.75rem',
-            }}
-          >
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
             Peak Periods, Troughs &amp; Loosing of the Bond
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
-            <div
-              style={{
-                background: 'var(--bg-tertiary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                padding: '0.75rem 1rem',
-                borderLeft: '3px solid var(--accent-green)',
-              }}
-            >
-              <div style={{ fontWeight: 700, color: 'var(--accent-green)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
-                Peak Periods
-              </div>
+            <div style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.75rem 1rem', borderLeft: '3px solid var(--accent-green)' }}>
+              <div style={{ fontWeight: 700, color: 'var(--accent-green)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Peak Periods</div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
-                When the L2 sub-period sign forms a conjunction, trine, or sextile with your L1 major period
-                sign (0, 4, or 2 signs apart), you&apos;re in a <strong style={{ color: 'var(--accent-green)' }}>peak period</strong>.
-                These are times of heightened productivity, opportunity, and momentum. Alignments during peak
-                periods carry extra weight.
+                When a Lot&apos;s L2 sub-period sign forms a conjunction, trine, or sextile with its L1 sign
+                (0, 2, 4, 8, or 10 signs apart), that Lot is in a <strong style={{ color: 'var(--accent-green)' }}>peak period</strong>.
+                Times of heightened productivity, opportunity, and momentum in that domain.
               </p>
             </div>
 
-            <div
-              style={{
-                background: 'var(--bg-tertiary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                padding: '0.75rem 1rem',
-                borderLeft: '3px solid var(--accent-pink)',
-              }}
-            >
-              <div style={{ fontWeight: 700, color: 'var(--accent-pink)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
-                Trough Periods
-              </div>
+            <div style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.75rem 1rem', borderLeft: '3px solid var(--accent-pink)' }}>
+              <div style={{ fontWeight: 700, color: 'var(--accent-pink)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Trough Periods</div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
-                When L2 forms a square or opposition with L1 (3 or 6 signs apart), you&apos;re in
-                a <strong style={{ color: 'var(--accent-pink)' }}>trough period</strong>. These are times of
-                challenge, restructuring, or inward focus. Use alignments during troughs for reflection,
-                preparation, and course correction rather than aggressive action.
+                When L2 forms a square or opposition with L1 (3, 6, or 9 signs apart), that Lot is in a{' '}
+                <strong style={{ color: 'var(--accent-pink)' }}>trough period</strong>. Times of challenge and restructuring.
+                Use these for reflection and preparation rather than aggressive action.
               </p>
             </div>
 
-            <div
-              style={{
-                background: 'var(--bg-tertiary)',
-                border: '1px solid var(--border-color)',
-                borderRadius: '6px',
-                padding: '0.75rem 1rem',
-                borderLeft: '3px solid var(--accent-amber)',
-              }}
-            >
-              <div style={{ fontWeight: 700, color: 'var(--accent-amber)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>
-                Loosing of the Bond
-              </div>
+            <div style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '0.75rem 1rem', borderLeft: '3px solid var(--accent-amber)' }}>
+              <div style={{ fontWeight: 700, color: 'var(--accent-amber)', fontSize: '0.875rem', marginBottom: '0.25rem' }}>Loosing of the Bond</div>
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
-                When the L2 sign is directly opposite (6 signs from) your Lot of Fortune&apos;s natal sign,
-                a special condition called <strong style={{ color: 'var(--accent-amber)' }}>Loosing of the Bond</strong> is
-                active. This signals a major pivot or turning point &mdash; a time when circumstances may
-                shift dramatically. It&apos;s shown as a special indicator on the ZR panel of your dashboard.
+                When a Lot&apos;s L2 sign is directly opposite (6 signs from) that Lot&apos;s natal sign, a special
+                condition called <strong style={{ color: 'var(--accent-amber)' }}>Loosing of the Bond</strong> is
+                active. This signals a major pivot or turning point in that domain.
               </p>
             </div>
           </div>
 
           {/* ZR column explanation */}
-          <h3
-            style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--accent-purple)',
-              marginBottom: '0.75rem',
-            }}
-          >
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
             The ZR Column on Your Dashboard
           </h3>
 
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
-            Once you add your birth time and birth city in Settings, the hour-by-hour table on your dashboard
-            gains a <strong style={{ color: 'var(--tier-transcendent)' }}>ZR column</strong>. Each hour where
-            the current planetary hour planet matches your ZR L4 ruler is marked with a{' '}
-            <span style={{ color: 'var(--tier-transcendent)' }}>✦</span> symbol. These are the hours where
-            your birth chart&apos;s time-lord agrees with the cosmic clock &mdash; even without a full
-            alignment, these hours carry personal significance.
+            Once you add your birth time and birth city in Settings, the hour-by-hour table gains a{' '}
+            <strong style={{ color: 'var(--tier-transcendent)' }}>ZR column</strong> showing a score from
+            0/4 to 4/4. This score indicates how many of the four Lots have their L4 ruler matching that
+            hour&apos;s planet. Hover over any score to see which specific Lots are aligned. A 4/4 means
+            all four Lots&apos; time-lords agree with the cosmic clock for that hour &mdash; extraordinarily rare.
           </p>
         </section>
 

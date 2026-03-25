@@ -668,46 +668,64 @@ export default function LearnPage() {
             available.
           </p>
 
-          {/* The Lot of Fortune */}
-          <h3
-            style={{
-              fontSize: '1rem',
-              fontWeight: 600,
-              color: 'var(--accent-purple)',
-              marginBottom: '0.75rem',
-            }}
-          >
-            The Lot of Fortune
+          {/* The Four Lots */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
+            The Four Lots
           </h3>
 
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>
-            The starting point for Zodiacal Releasing is the <strong style={{ color: 'var(--text-primary)' }}>Lot of Fortune</strong> (also
-            called the Part of Fortune). This is a mathematically derived point in your natal chart:
+            Supreme Alignment calculates ZR from <strong style={{ color: 'var(--text-primary)' }}>four Arabic Lots</strong> (also
+            called Parts), each governing a different life domain. These are mathematically derived points in your
+            natal chart, calculated from the positions of specific planets and the Ascendant:
           </p>
 
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.25rem' }}>
+            {[
+              { icon: '🏦', name: 'Lot of Fortune', domain: 'Material & Health', day: 'Asc + Moon − Sun', night: 'Asc + Sun − Moon', color: 'var(--accent-green)', desc: 'The most foundational Lot. Governs body, material circumstances, and livelihood. Fortune describes what happens to you — the conditions of your life.' },
+              { icon: '🧠', name: 'Lot of Spirit', domain: 'Career & Purpose', day: 'Asc + Sun − Moon', night: 'Asc + Moon − Sun', color: 'var(--accent-cyan)', desc: 'The reverse of Fortune. Spirit governs your mind, willpower, career actions, and purpose. Where Fortune is what happens to you, Spirit is what you do about it.' },
+              { icon: '💜', name: 'Lot of Eros', domain: 'Love & Desire', day: 'Asc + Venus − Spirit', night: 'Asc + Spirit − Venus', color: 'var(--accent-pink)', desc: 'Derived from Venus and Spirit. Eros governs desire, romantic love, passion, and attraction. It reveals the timing of heart-centered experiences.' },
+              { icon: '🏆', name: 'Lot of Victory', domain: 'Achievement', day: 'Asc + Jupiter − Spirit', night: 'Asc + Spirit − Jupiter', color: 'var(--accent-amber)', desc: 'Derived from Jupiter and Spirit. Victory governs competition, professional achievement, recognition, and triumph.' },
+            ].map((lot) => (
+              <div
+                key={lot.name}
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  padding: '0.75rem 1rem',
+                  borderLeft: `3px solid ${lot.color}`,
+                }}
+              >
+                <div style={{ fontWeight: 700, color: lot.color, fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                  {lot.icon} {lot.name} <span style={{ fontWeight: 400, color: 'var(--text-secondary)', fontSize: '0.75rem' }}>— {lot.domain}</span>
+                </div>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6, marginBottom: '0.375rem' }}>
+                  {lot.desc}
+                </p>
+                <div style={{ fontFamily: 'monospace', fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                  <span style={{ color: 'var(--accent-amber)' }}>Day:</span> {lot.day} &nbsp;|&nbsp; <span style={{ color: 'var(--accent-purple)' }}>Night:</span> {lot.night}
+                </div>
+              </div>
+            ))}
+          </div>
+
           <div
+            className="terminal-card"
             style={{
-              background: 'var(--bg-tertiary)',
-              border: '1px solid var(--border-color)',
-              borderRadius: '6px',
               padding: '1rem',
               marginBottom: '1.25rem',
-              fontFamily: 'monospace',
-              fontSize: '0.85rem',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid var(--border-color)',
             }}
           >
-            <p style={{ color: 'var(--accent-amber)', fontWeight: 600, marginBottom: '0.5rem' }}>FORMULA</p>
-            <p style={{ color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
-              <strong>Day chart:</strong> Lot = Ascendant + Moon &minus; Sun
+            <p style={{ color: 'var(--accent-amber)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+              HOW THEY CONNECT
             </p>
-            <p style={{ color: 'var(--text-primary)', marginBottom: '0.75rem' }}>
-              <strong>Night chart:</strong> Lot = Ascendant + Sun &minus; Moon
-            </p>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.5 }}>
-              The Ascendant is the degree of the zodiac rising on the eastern horizon at the moment of birth.
-              A &quot;day chart&quot; means the Sun was above the horizon (you were born during the day); a
-              &quot;night chart&quot; means it was below (born at night). The result is a specific degree that
-              falls in one of the 12 zodiac signs &mdash; that sign becomes the foundation of your ZR timeline.
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.875rem', lineHeight: 1.7 }}>
+              Spirit is Fortune with the Sun and Moon swapped. Eros and Victory both use Spirit&apos;s position
+              as an input &mdash; combined with Venus (for Eros) or Jupiter (for Victory). The calculation chain
+              is: <strong>Fortune → Spirit → Eros &amp; Victory</strong>. All four depend on the Ascendant, which
+              is why your exact birth time and location are essential.
             </p>
           </div>
 
@@ -940,6 +958,74 @@ export default function LearnPage() {
             this was considered one of the most significant timing indicators in a person&apos;s life.
             When active, it&apos;s shown on your dashboard&apos;s ZR panel.
           </p>
+
+          {/* Benefic/Malefic Classification */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--accent-purple)', marginBottom: '0.75rem' }}>
+            Benefic &amp; Malefic Planets
+          </h3>
+
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '0.75rem' }}>
+            In Hellenistic astrology, the seven classical planets are classified by their inherent nature.
+            Supreme Alignment uses a softened version of this system to determine the <strong style={{ color: 'var(--text-primary)' }}>prosperity level</strong> of
+            each Lot&apos;s current L4 micro-period:
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.25rem' }}>
+            {[
+              { nature: 'Benefic', planets: 'Venus, Jupiter', prosperity: 'Prosperous', color: 'var(--accent-green)', desc: 'The greater and lesser benefics. These planets naturally expand, harmonize, and bring favorable conditions. When a Lot\'s L4 ruler is benefic, that life domain is in a prosperous period.' },
+              { nature: 'Mildly Benefic', planets: 'Sun, Moon', prosperity: 'Favorable', color: 'var(--accent-amber)', desc: 'The luminaries. They bring vitality (Sun) and emotional support (Moon). Not as strongly benefic as Venus and Jupiter, but still positive. These count toward Cosmic Convergence.' },
+              { nature: 'Neutral', planets: 'Mercury', prosperity: 'Variable', color: 'var(--text-secondary)', desc: 'Mercury is a chameleon — it takes on the nature of whatever it\'s associated with. Variable conditions that depend on context.' },
+              { nature: 'Malefic', planets: 'Mars, Saturn', prosperity: 'Challenging', color: '#ef4444', desc: 'The greater and lesser malefics. These planets bring friction (Mars) and restriction (Saturn). Not inherently bad — they demand discipline, effort, and careful navigation. Growth often comes through challenge.' },
+            ].map((row) => (
+              <div
+                key={row.nature}
+                style={{
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: '6px',
+                  padding: '0.625rem 1rem',
+                  borderLeft: `3px solid ${row.color}`,
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.25rem' }}>
+                  <span style={{ fontWeight: 700, color: row.color, fontSize: '0.85rem' }}>{row.nature}</span>
+                  <span style={{ color: 'var(--text-primary)', fontSize: '0.8rem' }}>({row.planets})</span>
+                  <span style={{ color: row.color, fontSize: '0.75rem', fontWeight: 600 }}>&rarr; {row.prosperity}</span>
+                </div>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.5 }}>{row.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Cosmic Convergence */}
+          <h3 style={{ fontSize: '1rem', fontWeight: 600, color: 'var(--tier-transcendent)', marginBottom: '0.75rem' }}>
+            Cosmic Convergence
+          </h3>
+
+          <div
+            className="terminal-card"
+            style={{
+              padding: '1rem',
+              marginBottom: '1.25rem',
+              background: 'var(--bg-tertiary)',
+              border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)',
+            }}
+          >
+            <p style={{ color: 'var(--tier-transcendent)', fontSize: '0.8rem', fontWeight: 600, marginBottom: '0.5rem' }}>
+              COSMIC CONVERGENCE
+            </p>
+            <p style={{ color: 'var(--text-primary)', fontSize: '0.875rem', lineHeight: 1.7, marginBottom: '0.5rem' }}>
+              When <strong style={{ color: 'var(--tier-transcendent)' }}>3 or more of the 4 Lots</strong> have benefic
+              or mildly-benefic L4 rulers at the same time, a <strong style={{ color: 'var(--tier-transcendent)' }}>Cosmic
+              Convergence</strong> is active. This means multiple life domains are simultaneously in prosperous
+              periods &mdash; a universally favorable moment.
+            </p>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+              During Cosmic Convergence, all alignment themes can reach the Transcendent tier (when numerological
+              layers are also aligned), because the overwhelming benefic energy transcends individual domains.
+              Your dashboard shows a convergence score from 0/4 to 4/4 on the ZR panel.
+            </p>
+          </div>
         </section>
 
         {/* ============================================ */}

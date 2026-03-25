@@ -111,3 +111,130 @@ export function calculateZRState(lotSignIndex: number, birthDate: Date, now: Dat
 export function checkZRAlignment(l4Ruler: Planet, currentPlanet: Planet): boolean {
   return l4Ruler === currentPlanet
 }
+
+// ---------------------------------------------------------------------------
+// Multi-Lot ZR Support with Benefic/Malefic Classification
+// ---------------------------------------------------------------------------
+
+export type LotType = 'fortune' | 'spirit' | 'eros' | 'victory'
+
+export type ProsperityLevel = 'prosperous' | 'favorable' | 'variable' | 'challenging'
+
+export type PlanetNature = 'benefic' | 'mildly-benefic' | 'neutral' | 'malefic'
+
+export interface LotZRState {
+  lotType: LotType
+  domain: string
+  domainIcon: string
+  zr: ZRState
+  l4Nature: PlanetNature
+  prosperity: ProsperityLevel
+}
+
+export interface MultiLotZRState {
+  fortune: LotZRState
+  spirit: LotZRState
+  eros: LotZRState
+  victory: LotZRState
+  convergenceScore: number
+  isCosmicConvergence: boolean
+}
+
+const LOT_META: Record<LotType, { domain: string; icon: string }> = {
+  fortune: { domain: 'Material & Health', icon: '🏦' },
+  spirit: { domain: 'Career & Purpose', icon: '🧠' },
+  eros: { domain: 'Love & Desire', icon: '💜' },
+  victory: { domain: 'Achievement', icon: '🏆' },
+}
+
+export function classifyPlanetNature(planet: Planet): PlanetNature {
+  switch (planet) {
+    case 'Venus':
+    case 'Jupiter':
+      return 'benefic'
+    case 'Sun':
+    case 'Moon':
+      return 'mildly-benefic'
+    case 'Mercury':
+      return 'neutral'
+    case 'Mars':
+    case 'Saturn':
+      return 'malefic'
+    default:
+      return 'neutral'
+  }
+}
+
+export function getProsperityLevel(nature: PlanetNature): ProsperityLevel {
+  switch (nature) {
+    case 'benefic':
+      return 'prosperous'
+    case 'mildly-benefic':
+      return 'favorable'
+    case 'neutral':
+      return 'variable'
+    case 'malefic':
+      return 'challenging'
+  }
+}
+
+export function calculateMultiLotZR(
+  lotSignIndices: { fortune: number; spirit: number; eros: number; victory: number },
+  birthDate: Date,
+  now: Date,
+): MultiLotZRState | null {
+  const lotTypes: LotType[] = ['fortune', 'spirit', 'eros', 'victory']
+  const results = {} as Record<LotType, LotZRState>
+
+  for (const lot of lotTypes) {
+    const zr = calculateZRState(lotSignIndices[lot], birthDate, now)
+    if (!zr) return null
+
+    const l4Nature = classifyPlanetNature(zr.l4.ruler)
+    const prosperity = getProsperityLevel(l4Nature)
+    const meta = LOT_META[lot]
+
+    results[lot] = {
+      lotType: lot,
+      domain: meta.domain,
+      domainIcon: meta.icon,
+      zr,
+      l4Nature,
+      prosperity,
+    }
+  }
+
+  const convergenceScore = lotTypes.filter(
+    (lot) => results[lot].l4Nature === 'benefic' || results[lot].l4Nature === 'mildly-benefic',
+  ).length
+
+  return {
+    fortune: results.fortune,
+    spirit: results.spirit,
+    eros: results.eros,
+    victory: results.victory,
+    convergenceScore,
+    isCosmicConvergence: convergenceScore >= 3,
+  }
+}
+
+export function getHourLotMatches(
+  multiLot: MultiLotZRState,
+  hourPlanet: Planet,
+): { lot: LotType; domain: string; icon: string }[] {
+  const lotTypes: LotType[] = ['fortune', 'spirit', 'eros', 'victory']
+  const matches: { lot: LotType; domain: string; icon: string }[] = []
+
+  for (const lot of lotTypes) {
+    const lotState = multiLot[lot]
+    if (lotState.zr.l4.ruler === hourPlanet) {
+      matches.push({
+        lot,
+        domain: lotState.domain,
+        icon: lotState.domainIcon,
+      })
+    }
+  }
+
+  return matches
+}

@@ -3,6 +3,17 @@ import { type Planet } from './planetary-hours'
 export type AlignmentTheme = 'financial' | 'love' | 'health' | 'creativity' | 'spiritual'
 export type AlignmentTier = 'standard' | 'supreme' | 'super-supreme' | 'transcendent'
 
+export interface ZRContext {
+  /** Whether any lot's L4 ruler matches this hour's planet */
+  anyLotAligned: boolean
+  /** Per-theme: whether the RELEVANT lot(s) for this theme are benefic/mildly-benefic */
+  themeRelevantBenefic: Record<AlignmentTheme, boolean>
+  /** Cosmic convergence active (3+ lots benefic) */
+  isCosmicConvergence: boolean
+  /** Convergence score 0-4 */
+  convergenceScore: number
+}
+
 export interface Alignment {
   theme: AlignmentTheme
   label: string
@@ -11,6 +22,7 @@ export interface Alignment {
   icon: string
   tier: AlignmentTier
   zrBoosted: boolean
+  convergenceBoost: boolean
 }
 
 interface AlignmentRule {
@@ -21,6 +33,14 @@ interface AlignmentRule {
   suggestion: string
   color: string
   icon: string
+}
+
+export const THEME_LOT_RELEVANCE: Record<AlignmentTheme, string[]> = {
+  financial: ['victory', 'spirit'],
+  love: ['eros', 'fortune'],
+  health: ['fortune', 'victory'],
+  creativity: ['spirit', 'eros'],
+  spiritual: ['spirit', 'fortune'],
 }
 
 const ALIGNMENT_RULES: AlignmentRule[] = [
@@ -120,7 +140,7 @@ const TIER_SUGGESTIONS: Record<AlignmentTier, Record<AlignmentTheme, string>> = 
  * Standard Alignment: Planet matches + Personal Hour matches (2 layers)
  * Supreme Alignment: Standard + Personal Day ALSO matches (3 layers)
  * Super Supreme Alignment: Supreme + Personal Month ALSO matches (4 layers)
- * Transcendent Alignment: Super Supreme + ZR L4 ruler matches planetary hour (5 layers)
+ * Transcendent Alignment: Super Supreme + relevant ZR lot(s) are benefic OR cosmic convergence is active (5 layers)
  *
  * When ZR is aligned but tier is below Super Supreme, the alignment is marked
  * as zrBoosted (shown with a ZR badge) but not promoted to Transcendent.
@@ -130,7 +150,7 @@ export function findAlignments(
   personalHour: number,
   personalDay: number,
   personalMonth: number,
-  zrAligned: boolean = false
+  zrContext: ZRContext | null = null
 ): Alignment[] {
   return ALIGNMENT_RULES.filter(
     (rule) => rule.planets.includes(planet) && rule.personalHours.includes(personalHour)
@@ -138,8 +158,12 @@ export function findAlignments(
     const dayMatches = rule.personalHours.includes(personalDay)
     const monthMatches = rule.personalHours.includes(personalMonth)
 
+    const themeZrQualified = zrContext && (
+      zrContext.themeRelevantBenefic[rule.theme] || zrContext.isCosmicConvergence
+    )
+
     let tier: AlignmentTier = 'standard'
-    if (dayMatches && monthMatches && zrAligned) {
+    if (dayMatches && monthMatches && themeZrQualified) {
       tier = 'transcendent'
     } else if (dayMatches && monthMatches) {
       tier = 'super-supreme'
@@ -161,7 +185,8 @@ export function findAlignments(
       color: rule.color,
       icon: `${iconPrefix}${rule.icon}`,
       tier,
-      zrBoosted: zrAligned,
+      zrBoosted: !!(zrContext?.anyLotAligned),
+      convergenceBoost: !!(zrContext?.isCosmicConvergence),
     }
   })
 }

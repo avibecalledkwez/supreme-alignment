@@ -13,7 +13,8 @@ import {
 import { calculateNumerology, calculateAllPersonalHours, personalYear, personalMonth as calcPersonalMonth } from '@/lib/numerology'
 import { findAlignments, type Alignment, type AlignmentTier } from '@/lib/alignment-engine'
 import { calculateNatalChart } from '@/lib/natal-chart'
-import { calculateZRState, checkZRAlignment, type ZRState } from '@/lib/zodiacal-releasing'
+import { calculateMultiLotZR, getHourLotMatches, checkZRAlignment, classifyPlanetNature, getProsperityLevel, type MultiLotZRState, type LotType } from '@/lib/zodiacal-releasing'
+import { type ZRContext } from '@/lib/alignment-engine'
 import Link from 'next/link'
 import ThemeToggle from './ThemeToggle'
 import ZRPanel from './ZRPanel'
@@ -43,6 +44,8 @@ interface TimelineEntry {
   clockHourLabel: string
   bestTier: AlignmentTier | null
   zrMatch: boolean
+  zrLotMatches: { lot: LotType; domain: string; icon: string }[]
+  zrScore: number // 0-4 how many lots' L4 ruler matches this hour's planet
 }
 
 // Alignment details for expanded view
@@ -124,8 +127,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
   const [sunTimes, setSunTimes] = useState<{ sunrise: Date; sunset: Date } | null>(null)
   const [expandedAlignment, setExpandedAlignment] = useState<string | null>(null)
   const [countdown, setCountdown] = useState('')
-  const [zrState, setZrState] = useState<ZRState | null>(null)
-  const [zrAligned, setZrAligned] = useState(false)
+  const [multiLotZR, setMultiLotZR] = useState<MultiLotZRState | null>(null)
 
   const dataRef = useRef<{
     nextAlignment: typeof nextAlignment
@@ -186,8 +188,8 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
     const pYear = personalYear(birthMonth, birthDay, viewYear)
     const pMonth = calcPersonalMonth(pYear, viewMonth)
 
-    // Calculate Zodiacal Releasing if birth data available
-    let currentZrState: ZRState | null = null
+    // Calculate Zodiacal Releasing (all 4 Lots) if birth data available
+    let currentMultiLot: MultiLotZRState | null = null
     if (profile.birth_time && profile.birth_latitude != null && profile.birth_longitude != null) {
       const [bHour, bMinute] = profile.birth_time.split(':').map(Number)
       const natal = calculateNatalChart({
@@ -203,22 +205,55 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
         parseInt(birthParts[0], 10), birthMonth - 1, birthDay,
         bHour, bMinute
       )
-      currentZrState = calculateZRState(natal.lotOfFortuneSignIndex, birthDate, currentTime)
-      setZrState(currentZrState)
-      if (currentZrState && current) {
-        setZrAligned(checkZRAlignment(currentZrState.l4.ruler, current.planet))
-      } else {
-        setZrAligned(false)
-      }
+      currentMultiLot = calculateMultiLotZR(
+        {
+          fortune: natal.lotOfFortuneSignIndex,
+          spirit: natal.lotOfSpiritSignIndex,
+          eros: natal.lotOfErosSignIndex,
+          victory: natal.lotOfVictorySignIndex,
+        },
+        birthDate,
+        currentTime
+      )
+      setMultiLotZR(currentMultiLot)
     } else {
-      setZrState(null)
-      setZrAligned(false)
+      setMultiLotZR(null)
+    }
+
+    // Helper to build ZRContext for a given planetary hour planet
+    const buildZRContext = (hourPlanet: typeof current extends null ? never : NonNullable<typeof current>['planet']): ZRContext | null => {
+      if (!currentMultiLot) return null
+      const lotTypes: LotType[] = ['fortune', 'spirit', 'eros', 'victory']
+      const anyLotAligned = lotTypes.some(l => checkZRAlignment(currentMultiLot![l].zr.l4.ruler, hourPlanet))
+
+      // For each theme, check if the relevant lot(s) have benefic/mildly-benefic L4
+      const themeRelevantBenefic: Record<string, boolean> = {}
+      const THEME_LOT_MAP: Record<string, string[]> = {
+        financial: ['victory', 'spirit'],
+        love: ['eros', 'fortune'],
+        health: ['fortune', 'victory'],
+        creativity: ['spirit', 'eros'],
+        spiritual: ['spirit', 'fortune'],
+      }
+      for (const [theme, lots] of Object.entries(THEME_LOT_MAP)) {
+        themeRelevantBenefic[theme] = lots.some(l => {
+          const nature = currentMultiLot![l as LotType].l4Nature
+          return nature === 'benefic' || nature === 'mildly-benefic'
+        })
+      }
+
+      return {
+        anyLotAligned,
+        themeRelevantBenefic: themeRelevantBenefic as Record<'financial' | 'love' | 'health' | 'creativity' | 'spiritual', boolean>,
+        isCosmicConvergence: currentMultiLot.isCosmicConvergence,
+        convergenceScore: currentMultiLot.convergenceScore,
+      }
     }
 
     // Active alignments for current hour (live)
     if (current && isViewingToday) {
-      const currentHourZr = currentZrState && checkZRAlignment(currentZrState.l4.ruler, current.planet)
-      const aligns = findAlignments(current.planet, numProfile.personalHour, numProfile.personalDay, numProfile.personalMonth, currentHourZr || false)
+      const zrCtx = buildZRContext(current.planet)
+      const aligns = findAlignments(current.planet, numProfile.personalHour, numProfile.personalDay, numProfile.personalMonth, zrCtx)
       setActiveAlignments(aligns)
       dataRef.current.activeAlignments = aligns
     } else {
@@ -246,8 +281,10 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
 
       // For the viewed date, use the correct personal day
       const { personalDay: pDayForDate } = calculateNumerology(birthMonth, birthDay, new Date(viewDate.getFullYear(), viewDate.getMonth(), viewDate.getDate(), clockHourForCalc))
-      const hourZrMatch = currentZrState ? checkZRAlignment(currentZrState.l4.ruler, ph.planet) : false
-      const alignsCorrect = findAlignments(ph.planet, pHour, pDayForDate, pMonth, hourZrMatch)
+      const hourZrCtx = buildZRContext(ph.planet)
+      const hourLotMatches = currentMultiLot ? getHourLotMatches(currentMultiLot, ph.planet) : []
+      const hourZrMatch = hourLotMatches.length > 0
+      const alignsCorrect = findAlignments(ph.planet, pHour, pDayForDate, pMonth, hourZrCtx)
 
       const bestTier = alignsCorrect.length > 0
         ? (alignsCorrect.some(a => a.tier === 'transcendent') ? 'transcendent' as const
@@ -263,6 +300,8 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
         clockHourLabel: label,
         bestTier,
         zrMatch: hourZrMatch,
+        zrLotMatches: hourLotMatches,
+        zrScore: hourLotMatches.length,
       }
     })
     setTimeline(entries)
@@ -301,7 +340,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       dataRef.current.nextAlignment = null
     }
 
-  }, [lat, lon, birthMonth, birthDay, selectedDate, isViewingToday, activeAlignments.length, profile.birth_time, profile.birth_latitude, profile.birth_longitude])
+  }, [lat, lon, birthMonth, birthDay, selectedDate, isViewingToday, activeAlignments.length, profile.birth_time, profile.birth_latitude, profile.birth_longitude, birthParts])
 
   useEffect(() => {
     if (!selectedDate) return
@@ -654,8 +693,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       {/* Zodiacal Releasing Panel */}
       <div className="mb-6">
         <ZRPanel
-          zrState={zrState}
-          zrAligned={zrAligned}
+          multiLotZR={multiLotZR}
           hasBirthData={!!(profile.birth_time && profile.birth_latitude != null)}
         />
       </div>
@@ -707,8 +745,13 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                     </p>
                     <p className="mt-1">Personal Hour: <span style={{ color: 'var(--accent-cyan)' }}>{entry.personalHour}</span></p>
                     {isCurrent && <p className="mt-1 font-bold" style={{ color: '#fff' }}>◉ YOU ARE HERE</p>}
-                    {entry.zrMatch && (
-                      <p className="mt-1" style={{ color: 'var(--tier-transcendent)' }}>ZR L4 ruler matches this hour</p>
+                    {entry.zrScore > 0 && (
+                      <div className="mt-1">
+                        <p style={{ color: 'var(--tier-transcendent)' }}>ZR Lots matched: {entry.zrScore}/4</p>
+                        {entry.zrLotMatches.map((m, mi) => (
+                          <p key={mi} style={{ color: 'var(--accent-green)' }}>{m.icon} {m.domain}</p>
+                        ))}
+                      </div>
                     )}
                     {hasAlignment && (
                       <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
@@ -773,7 +816,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 <th className="text-left py-2 px-2">PLANET</th>
                 <th className="text-center py-2 px-2">P.HOUR</th>
                 <th className="text-left py-2 px-2">TYPE</th>
-                {zrState && <th className="text-center py-2 px-2" style={{ color: 'var(--tier-transcendent)' }}>ZR</th>}
+                {multiLotZR && <th className="text-center py-2 px-2" style={{ color: 'var(--tier-transcendent)' }}>ZR</th>}
                 <th className="text-left py-2 px-2">ALIGNMENTS</th>
               </tr>
             </thead>
@@ -822,15 +865,45 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                     <td className="py-2 px-2" style={{ color: 'var(--text-secondary)' }}>
                       {entry.planetaryHour.isDay ? '☀ Day' : '☾ Night'}
                     </td>
-                    {zrState && (
-                      <td className="py-2 px-2 text-center">
-                        {entry.zrMatch ? (
-                          <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold" style={{
-                            background: 'rgba(var(--tier-transcendent-rgb),0.15)',
-                            color: 'var(--tier-transcendent)',
-                            border: '1px solid rgba(var(--tier-transcendent-rgb),0.3)',
-                          }}>
-                            ✦
+                    {multiLotZR && (
+                      <td className="py-2 px-2 text-center relative">
+                        {entry.zrScore > 0 ? (
+                          <span className="group/zr inline-block relative cursor-help">
+                            <span className="inline-block px-1.5 py-0.5 rounded text-[9px] font-bold" style={{
+                              background: entry.zrScore >= 3
+                                ? 'rgba(var(--tier-transcendent-rgb),0.2)'
+                                : entry.zrScore >= 1
+                                  ? 'rgba(var(--tier-transcendent-rgb),0.12)'
+                                  : 'transparent',
+                              color: entry.zrScore >= 3 ? 'var(--tier-transcendent)' : 'var(--accent-cyan)',
+                              border: entry.zrScore >= 3
+                                ? '1px solid rgba(var(--tier-transcendent-rgb),0.4)'
+                                : '1px solid rgba(6,182,212,0.3)',
+                            }}>
+                              {entry.zrScore}/4
+                            </span>
+                            {/* Hover tooltip */}
+                            <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/zr:block z-50 pointer-events-none" style={{ filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.5))' }}>
+                              <span className="block p-2 min-w-[160px] text-[10px] rounded-lg text-left" style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
+                                <span className="block font-bold mb-1" style={{ color: 'var(--tier-transcendent)' }}>
+                                  ZR Lot Matches ({entry.zrScore}/4)
+                                </span>
+                                {entry.zrLotMatches.map((m, mi) => (
+                                  <span key={mi} className="block" style={{ color: 'var(--accent-green)' }}>
+                                    {m.icon} {m.domain}
+                                  </span>
+                                ))}
+                                {entry.zrScore < 4 && (
+                                  <span className="block mt-1" style={{ color: 'var(--text-secondary)' }}>
+                                    {['fortune', 'spirit', 'eros', 'victory']
+                                      .filter(l => !entry.zrLotMatches.some(m => m.lot === l))
+                                      .map(l => l === 'fortune' ? '🏦' : l === 'spirit' ? '🧠' : l === 'eros' ? '💜' : '🏆')
+                                      .join(' ')}{' '}
+                                    not aligned
+                                  </span>
+                                )}
+                              </span>
+                            </span>
                           </span>
                         ) : (
                           <span style={{ color: 'var(--text-secondary)', opacity: 0.3 }}>—</span>

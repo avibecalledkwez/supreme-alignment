@@ -28,11 +28,22 @@ export interface NatalChartInput {
 export interface NatalChartData {
   sunLongitude: number
   moonLongitude: number
+  venusLongitude: number
+  jupiterLongitude: number
   ascendantLongitude: number
   isDayChart: boolean
   lotOfFortuneLongitude: number
   lotOfFortuneSign: ZodiacSign
   lotOfFortuneSignIndex: number
+  lotOfSpiritLongitude: number
+  lotOfSpiritSign: ZodiacSign
+  lotOfSpiritSignIndex: number
+  lotOfErosLongitude: number
+  lotOfErosSign: ZodiacSign
+  lotOfErosSignIndex: number
+  lotOfVictoryLongitude: number
+  lotOfVictorySign: ZodiacSign
+  lotOfVictorySignIndex: number
 }
 
 function signIndexFromLongitude(lon: number): number {
@@ -81,25 +92,61 @@ export function calculateNatalChart(input: NatalChartInput): NatalChartData {
   const moonPos = Astronomy.EclipticGeoMoon(astroTime)
   const moonLongitude = moonPos.lon
 
+  const venusGeo = Astronomy.GeoVector(Astronomy.Body.Venus, astroTime, true)
+  const venusEcl = Astronomy.Ecliptic(venusGeo)
+  const venusLongitude = venusEcl.elon
+
+  const jupiterGeo = Astronomy.GeoVector(Astronomy.Body.Jupiter, astroTime, true)
+  const jupiterEcl = Astronomy.Ecliptic(jupiterGeo)
+  const jupiterLongitude = jupiterEcl.elon
+
   const ascendantLongitude = calculateAscendant(moment, input.birthLat, input.birthLng)
   const isDayChart = isDayChartCalc(sunLongitude, ascendantLongitude)
 
-  let lotLongitude: number
-  if (isDayChart) {
-    lotLongitude = ((ascendantLongitude + moonLongitude - sunLongitude) % 360 + 360) % 360
-  } else {
-    lotLongitude = ((ascendantLongitude + sunLongitude - moonLongitude) % 360 + 360) % 360
-  }
+  const norm = (v: number) => ((v % 360) + 360) % 360
 
-  const lotSignIndex = signIndexFromLongitude(lotLongitude)
+  // Lot of Fortune: Day = Asc + Moon - Sun, Night = Asc + Sun - Moon
+  const fortuneLongitude = isDayChart
+    ? norm(ascendantLongitude + moonLongitude - sunLongitude)
+    : norm(ascendantLongitude + sunLongitude - moonLongitude)
+  const fortuneSignIndex = signIndexFromLongitude(fortuneLongitude)
+
+  // Lot of Spirit (reverse of Fortune): Day = Asc + Sun - Moon, Night = Asc + Moon - Sun
+  const spiritLongitude = isDayChart
+    ? norm(ascendantLongitude + sunLongitude - moonLongitude)
+    : norm(ascendantLongitude + moonLongitude - sunLongitude)
+  const spiritSignIndex = signIndexFromLongitude(spiritLongitude)
+
+  // Lot of Eros: Day = Asc + Venus - Spirit, Night = Asc + Spirit - Venus
+  const erosLongitude = isDayChart
+    ? norm(ascendantLongitude + venusLongitude - spiritLongitude)
+    : norm(ascendantLongitude + spiritLongitude - venusLongitude)
+  const erosSignIndex = signIndexFromLongitude(erosLongitude)
+
+  // Lot of Victory: Day = Asc + Jupiter - Spirit, Night = Asc + Spirit - Jupiter
+  const victoryLongitude = isDayChart
+    ? norm(ascendantLongitude + jupiterLongitude - spiritLongitude)
+    : norm(ascendantLongitude + spiritLongitude - jupiterLongitude)
+  const victorySignIndex = signIndexFromLongitude(victoryLongitude)
 
   return {
     sunLongitude,
     moonLongitude,
+    venusLongitude,
+    jupiterLongitude,
     ascendantLongitude,
     isDayChart,
-    lotOfFortuneLongitude: lotLongitude,
-    lotOfFortuneSign: ZODIAC_SIGNS[lotSignIndex],
-    lotOfFortuneSignIndex: lotSignIndex,
+    lotOfFortuneLongitude: fortuneLongitude,
+    lotOfFortuneSign: ZODIAC_SIGNS[fortuneSignIndex],
+    lotOfFortuneSignIndex: fortuneSignIndex,
+    lotOfSpiritLongitude: spiritLongitude,
+    lotOfSpiritSign: ZODIAC_SIGNS[spiritSignIndex],
+    lotOfSpiritSignIndex: spiritSignIndex,
+    lotOfErosLongitude: erosLongitude,
+    lotOfErosSign: ZODIAC_SIGNS[erosSignIndex],
+    lotOfErosSignIndex: erosSignIndex,
+    lotOfVictoryLongitude: victoryLongitude,
+    lotOfVictorySign: ZODIAC_SIGNS[victorySignIndex],
+    lotOfVictorySignIndex: victorySignIndex,
   }
 }
