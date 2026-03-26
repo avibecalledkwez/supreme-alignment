@@ -425,9 +425,9 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
         </div>
         <div className="flex items-center gap-3">
           {navLinks.length > 0 && (
-            <div className="flex gap-2">
+            <div className="flex gap-2" style={{ position: 'relative', zIndex: 100 }}>
               {navLinks.map((link) => (
-                <Link
+                <a
                   key={link.href}
                   href={link.href}
                   className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wider"
@@ -435,10 +435,15 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                     background: 'var(--bg-tertiary)',
                     color: link.color,
                     border: '1px solid var(--border-color)',
+                    textDecoration: 'none',
+                    position: 'relative',
+                    zIndex: 100,
+                    cursor: 'pointer',
+                    display: 'inline-block',
                   }}
                 >
                   {link.label}
-                </Link>
+                </a>
               ))}
             </div>
           )}
