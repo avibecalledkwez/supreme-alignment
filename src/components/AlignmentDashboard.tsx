@@ -414,7 +414,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
   return (
     <div className="min-h-screen p-4 md:p-6 max-w-[1600px] mx-auto">
       {/* Top Bar */}
-      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
+      <div className="flex items-center justify-between mb-6 gap-4 flex-wrap" style={{ position: 'relative', zIndex: 60 }}>
         <div>
           <h1 className="text-xl font-bold tracking-tight" style={{ color: 'var(--accent-cyan)' }}>
             SUPREME ALIGNMENT
@@ -451,7 +451,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       </div>
 
       {/* Date Picker */}
-      <div className="terminal-card p-4 mb-6">
+      <div className="terminal-card p-4 mb-6" style={{ position: 'relative', zIndex: 55 }}>
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
             <label className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>
