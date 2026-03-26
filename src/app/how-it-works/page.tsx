@@ -462,18 +462,11 @@ export default function HowItWorksPage() {
                 boxShadow: '0 0 20px rgba(var(--tier-transcendent-rgb), 0.15), inset 0 0 20px rgba(var(--tier-transcendent-rgb), 0.05)',
               }}
             >
-              <h3
-                style={{
-                  fontSize: '1rem',
-                  fontWeight: 700,
-                  color: 'var(--tier-transcendent)',
-                  marginBottom: '0.5rem',
-                }}
-              >
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--tier-transcendent)', marginBottom: '0.5rem' }}>
                 Transcendent Alignment 🌌
               </h3>
               <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
-                5 LAYERS OF SYNCHRONICITY
+                3 LAYERS — PLANET + PERSONAL HOUR + LOT BENEFIC
               </div>
 
               <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
@@ -484,22 +477,16 @@ export default function HowItWorksPage() {
                   Personal Hour
                 </div>
                 <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-transcendent-rgb), 0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)' }}>
-                  Personal Day
-                </div>
-                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-transcendent-rgb), 0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)' }}>
-                  Personal Month
-                </div>
-                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-transcendent-rgb), 0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb), 0.3)' }}>
-                  ZR L4 Ruler
+                  Lot L4 Benefic
                 </div>
               </div>
 
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
-                The rarest and most powerful alignment possible. All four numerological layers AND your natal
-                chart&apos;s Zodiacal Releasing Lots are synchronized. Supreme Alignment checks the relevant
-                Lots for each theme &mdash; when those Lots have benefic L4 rulers, or when a Cosmic
-                Convergence (3+ Lots benefic) is active, the alignment reaches Transcendent. Five independent
-                timing systems all pointing the same direction. Act with absolute conviction.
+                When the planetary hour and your personal hour align for a theme, AND the relevant Zodiacal
+                Releasing Lot for that theme has a benefic L4 ruler, the alignment is Transcendent. Your birth
+                chart&apos;s time-lord confirms that this domain is in a prosperous period. Each theme checks its
+                specific Lot: Love checks Eros, Financial checks Victory, Health checks Fortune, and Creativity
+                and Spiritual check Spirit.
               </p>
 
               <div
@@ -514,10 +501,52 @@ export default function HowItWorksPage() {
                   lineHeight: 1.6,
                 }}
               >
-                <strong style={{ color: 'var(--tier-transcendent)' }}>Requires birth time:</strong> Transcendent
-                alignments use Zodiacal Releasing from four Lots (Fortune, Spirit, Eros, Victory), which require
-                your exact birth time and birth city. Add these in Settings to unlock this tier.
+                <strong style={{ color: 'var(--tier-transcendent)' }}>Requires birth time:</strong> Uses
+                Zodiacal Releasing from four Lots (Fortune, Spirit, Eros, Victory), which require your exact
+                birth time and birth city. Add these in Settings to unlock.
               </div>
+            </div>
+
+            {/* Super Transcendent */}
+            <div
+              style={{
+                background: 'var(--bg-tertiary)',
+                border: '1px solid var(--tier-super-transcendent)',
+                borderRadius: '8px',
+                padding: '1.25rem',
+                position: 'relative',
+                boxShadow: '0 0 20px rgba(var(--tier-super-transcendent-rgb), 0.15), inset 0 0 20px rgba(var(--tier-super-transcendent-rgb), 0.05)',
+              }}
+            >
+              <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--tier-super-transcendent)', marginBottom: '0.5rem' }}>
+                Super Transcendent Alignment 💎
+              </h3>
+              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '0.75rem' }}>
+                4 LAYERS — PLANET + PERSONAL HOUR + LOT BENEFIC + PERSONAL MONTH
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-super-transcendent-rgb), 0.15)', color: 'var(--tier-super-transcendent)', border: '1px solid rgba(var(--tier-super-transcendent-rgb), 0.3)' }}>
+                  Planet Match
+                </div>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-super-transcendent-rgb), 0.15)', color: 'var(--tier-super-transcendent)', border: '1px solid rgba(var(--tier-super-transcendent-rgb), 0.3)' }}>
+                  Personal Hour
+                </div>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-super-transcendent-rgb), 0.15)', color: 'var(--tier-super-transcendent)', border: '1px solid rgba(var(--tier-super-transcendent-rgb), 0.3)' }}>
+                  Lot L4 Benefic
+                </div>
+                <div style={{ flex: 1, minWidth: '5rem', padding: '0.375rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, background: 'rgba(var(--tier-super-transcendent-rgb), 0.15)', color: 'var(--tier-super-transcendent)', border: '1px solid rgba(var(--tier-super-transcendent-rgb), 0.3)' }}>
+                  Personal Month
+                </div>
+              </div>
+
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.8rem', lineHeight: 1.6 }}>
+                The absolute pinnacle. Transcendent conditions are met (planetary hour, personal hour, and
+                benefic Lot), AND your personal month number also resonates with the same theme. This is the
+                rarest alignment in Supreme Alignment &mdash; your birth chart&apos;s time-lord, the cosmos,
+                your hourly cycle, and your monthly cycle are ALL synchronized. This is the moment your
+                timeline was written for.
+              </p>
             </div>
           </div>
 
@@ -602,9 +631,21 @@ export default function HowItWorksPage() {
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--tier-transcendent)', fontWeight: 600 }}>
                     Transcendent 🌌
                   </td>
-                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>5</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>3</td>
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
-                    Planet + Hour + Day + Month + Benefic ZR Lot(s)
+                    Planet + Hour + Benefic ZR Lot
+                  </td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                    Depends on L4 period length
+                  </td>
+                </tr>
+                <tr>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--tier-super-transcendent)', fontWeight: 600 }}>
+                    Super Transcendent 💎
+                  </td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-primary)' }}>4</td>
+                  <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
+                    Planet + Hour + Benefic ZR Lot + Month
                   </td>
                   <td style={{ padding: '0.5rem 0.75rem', borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)' }}>
                     Extremely rare — once a year or less

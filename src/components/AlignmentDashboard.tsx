@@ -112,6 +112,7 @@ const TIER_COLORS: Record<AlignmentTier, string> = {
   'supreme': 'var(--tier-supreme)',
   'super-supreme': 'var(--tier-super)',
   'transcendent': 'var(--tier-transcendent)',
+  'super-transcendent': 'var(--tier-super-transcendent)',
 }
 
 export default function AlignmentDashboard({ profile, navLinks = [] }: { profile: UserProfile; navLinks?: NavLink[] }) {
@@ -287,7 +288,8 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       const alignsCorrect = findAlignments(ph.planet, pHour, pDayForDate, pMonth, hourZrCtx)
 
       const bestTier = alignsCorrect.length > 0
-        ? (alignsCorrect.some(a => a.tier === 'transcendent') ? 'transcendent' as const
+        ? (alignsCorrect.some(a => a.tier === 'super-transcendent') ? 'super-transcendent' as const
+          : alignsCorrect.some(a => a.tier === 'transcendent') ? 'transcendent' as const
           : alignsCorrect.some(a => a.tier === 'super-supreme') ? 'super-supreme' as const
           : alignsCorrect.some(a => a.tier === 'supreme') ? 'supreme' as const
           : 'standard' as const)
@@ -396,6 +398,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
   const viewDate = isViewingToday ? now : new Date(selectedDate + 'T12:00:00')
 
   // Count tiers for the day
+  const superTranscendentCount = timeline.filter(e => e.bestTier === 'super-transcendent').length
   const transcendentCount = timeline.filter(e => e.bestTier === 'transcendent').length
   const supremeCount = timeline.filter(e => e.bestTier === 'supreme').length
   const superSupremeCount = timeline.filter(e => e.bestTier === 'super-supreme').length
@@ -481,6 +484,11 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
 
           {/* Day summary badges */}
           <div className="flex items-center gap-2 ml-auto">
+            {superTranscendentCount > 0 && (
+              <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(var(--tier-super-transcendent-rgb),0.15)', color: 'var(--tier-super-transcendent)', border: '1px solid rgba(var(--tier-super-transcendent-rgb),0.3)' }}>
+                💎 {superTranscendentCount} Super Transcendent
+              </span>
+            )}
             {transcendentCount > 0 && (
               <span className="text-[10px] px-2 py-1 rounded font-bold" style={{ background: 'rgba(var(--tier-transcendent-rgb),0.15)', color: 'var(--tier-transcendent)', border: '1px solid rgba(var(--tier-transcendent-rgb),0.3)' }}>
                 🌌 {transcendentCount} Transcendent
@@ -508,20 +516,24 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
       {/* Active Alignment Banner (only when viewing today) */}
       {isViewingToday && activeAlignments.length > 0 && (
         <div className="alignment-active mb-6 rounded-lg p-4" style={{
-          background: activeAlignments.some(a => a.tier === 'transcendent')
-            ? 'linear-gradient(135deg, rgba(var(--tier-transcendent-rgb),0.15), rgba(var(--tier-transcendent-rgb),0.03))'
-            : activeAlignments.some(a => a.tier === 'super-supreme')
-              ? 'linear-gradient(135deg, rgba(var(--tier-super-rgb),0.15), rgba(var(--tier-super-rgb),0.03))'
-              : activeAlignments.some(a => a.tier === 'supreme')
-                ? 'linear-gradient(135deg, rgba(var(--tier-supreme-rgb),0.15), rgba(var(--tier-supreme-rgb),0.03))'
-                : `linear-gradient(135deg, ${activeAlignments[0].color}15, ${activeAlignments[0].color}05)`,
-          border: activeAlignments.some(a => a.tier === 'transcendent')
-            ? '1px solid rgba(var(--tier-transcendent-rgb),0.4)'
-            : activeAlignments.some(a => a.tier === 'super-supreme')
-              ? '1px solid rgba(var(--tier-super-rgb),0.4)'
-              : activeAlignments.some(a => a.tier === 'supreme')
-                ? '1px solid rgba(var(--tier-supreme-rgb),0.4)'
-                : `1px solid ${activeAlignments[0].color}40`,
+          background: activeAlignments.some(a => a.tier === 'super-transcendent')
+            ? 'linear-gradient(135deg, rgba(var(--tier-super-transcendent-rgb),0.15), rgba(var(--tier-super-transcendent-rgb),0.03))'
+            : activeAlignments.some(a => a.tier === 'transcendent')
+              ? 'linear-gradient(135deg, rgba(var(--tier-transcendent-rgb),0.15), rgba(var(--tier-transcendent-rgb),0.03))'
+              : activeAlignments.some(a => a.tier === 'super-supreme')
+                ? 'linear-gradient(135deg, rgba(var(--tier-super-rgb),0.15), rgba(var(--tier-super-rgb),0.03))'
+                : activeAlignments.some(a => a.tier === 'supreme')
+                  ? 'linear-gradient(135deg, rgba(var(--tier-supreme-rgb),0.15), rgba(var(--tier-supreme-rgb),0.03))'
+                  : `linear-gradient(135deg, ${activeAlignments[0].color}15, ${activeAlignments[0].color}05)`,
+          border: activeAlignments.some(a => a.tier === 'super-transcendent')
+            ? '1px solid rgba(var(--tier-super-transcendent-rgb),0.4)'
+            : activeAlignments.some(a => a.tier === 'transcendent')
+              ? '1px solid rgba(var(--tier-transcendent-rgb),0.4)'
+              : activeAlignments.some(a => a.tier === 'super-supreme')
+                ? '1px solid rgba(var(--tier-super-rgb),0.4)'
+                : activeAlignments.some(a => a.tier === 'supreme')
+                  ? '1px solid rgba(var(--tier-supreme-rgb),0.4)'
+                  : `1px solid ${activeAlignments[0].color}40`,
         }}>
           {activeAlignments.map((a, i) => (
             <div key={i} className={i > 0 ? 'mt-3' : ''}>
@@ -529,7 +541,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 <span className="text-2xl">{a.icon}</span>
                 <div>
                   <p className="text-sm font-bold uppercase tracking-wider" style={{
-                    color: a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
+                    color: a.tier === 'super-transcendent' ? 'var(--tier-super-transcendent)' : a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
                   }}>
                     {a.label} — ACTIVE NOW
                   </p>
@@ -635,6 +647,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
               <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
                 {timeline.filter(e => e.alignments.length > 0).length} alignment windows
               </p>
+              {superTranscendentCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-super-transcendent)' }}>💎 {superTranscendentCount} Super Transcendent</p>}
               {transcendentCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-transcendent)' }}>🌌 {transcendentCount} Transcendent</p>}
               {superSupremeCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-super)' }}>👑 {superSupremeCount} Super Supreme</p>}
               {supremeCount > 0 && <p className="text-xs" style={{ color: 'var(--tier-supreme)' }}>⚜️ {supremeCount} Supreme</p>}
@@ -685,7 +698,11 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--tier-transcendent)' }} />
-            <span className="text-xs" style={{ color: 'var(--tier-transcendent)' }}>🌌 Transcendent — + Zodiacal Releasing aligned</span>
+            <span className="text-xs" style={{ color: 'var(--tier-transcendent)' }}>🌌 Transcendent — Lot benefic + Hour aligned</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-3 h-3 rounded-sm" style={{ background: 'var(--tier-super-transcendent)' }} />
+            <span className="text-xs" style={{ color: 'var(--tier-super-transcendent)' }}>💎 Super Transcendent — + Lot benefic + Month aligned</span>
           </div>
         </div>
       </div>
@@ -708,9 +725,9 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
           {timeline.map((entry, idx) => {
             const isCurrent = isCurrentHour(entry)
             const hasAlignment = entry.alignments.length > 0
-            const barHeight = hasAlignment ? (entry.bestTier === 'transcendent' ? '100%' : entry.bestTier === 'super-supreme' ? '95%' : entry.bestTier === 'supreme' ? '85%' : '70%') : '35%'
+            const barHeight = hasAlignment ? ((entry.bestTier === 'super-transcendent' || entry.bestTier === 'transcendent') ? '100%' : entry.bestTier === 'super-supreme' ? '95%' : entry.bestTier === 'supreme' ? '85%' : '70%') : '35%'
             const planet = entry.planetaryHour.planet
-            const tierRgb = entry.bestTier === 'transcendent' ? 'var(--tier-transcendent-rgb)' : entry.bestTier === 'super-supreme' ? 'var(--tier-super-rgb)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme-rgb)' : ''
+            const tierRgb = entry.bestTier === 'super-transcendent' ? 'var(--tier-super-transcendent-rgb)' : entry.bestTier === 'transcendent' ? 'var(--tier-transcendent-rgb)' : entry.bestTier === 'super-supreme' ? 'var(--tier-super-rgb)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme-rgb)' : ''
 
             return (
               <div
@@ -756,7 +773,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                     {hasAlignment && (
                       <div className="mt-2 pt-2" style={{ borderTop: '1px solid var(--border-color)' }}>
                         {entry.alignments.map((a, i) => (
-                          <p key={i} style={{ color: a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>
+                          <p key={i} style={{ color: a.tier === 'super-transcendent' ? 'var(--tier-super-transcendent)' : a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>
                             {a.icon} {a.label}
                           </p>
                         ))}
@@ -776,7 +793,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                 {hasAlignment && (
                   <div
                     className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 rounded-full"
-                    style={{ background: entry.bestTier === 'transcendent' ? 'var(--tier-transcendent)' : entry.bestTier === 'super-supreme' ? 'var(--tier-super)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme)' : entry.alignments[0].color }}
+                    style={{ background: entry.bestTier === 'super-transcendent' ? 'var(--tier-super-transcendent)' : entry.bestTier === 'transcendent' ? 'var(--tier-transcendent)' : entry.bestTier === 'super-supreme' ? 'var(--tier-super)' : entry.bestTier === 'supreme' ? 'var(--tier-supreme)' : entry.alignments[0].color }}
                   />
                 )}
               </div>
@@ -839,13 +856,15 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                       borderBottom: '1px solid var(--border-color)',
                       background: isCurrent
                         ? 'rgba(255, 255, 255, 0.06)'
-                        : entry.bestTier === 'transcendent'
-                          ? 'rgba(var(--tier-transcendent-rgb), 0.06)'
-                          : entry.bestTier === 'super-supreme'
-                            ? 'rgba(var(--tier-super-rgb), 0.04)'
-                            : entry.bestTier === 'supreme'
-                              ? 'rgba(var(--tier-supreme-rgb), 0.04)'
-                              : 'transparent',
+                        : entry.bestTier === 'super-transcendent'
+                          ? 'rgba(var(--tier-super-transcendent-rgb), 0.06)'
+                          : entry.bestTier === 'transcendent'
+                            ? 'rgba(var(--tier-transcendent-rgb), 0.06)'
+                            : entry.bestTier === 'super-supreme'
+                              ? 'rgba(var(--tier-super-rgb), 0.04)'
+                              : entry.bestTier === 'supreme'
+                                ? 'rgba(var(--tier-supreme-rgb), 0.04)'
+                                : 'transparent',
                     }}
                   >
                     <td className="py-2 px-2 font-mono" style={{
@@ -919,21 +938,25 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                 key={i}
                                 className="inline-block px-2 py-0.5 rounded text-[10px] font-semibold uppercase"
                                 style={{
-                                  background: a.tier === 'transcendent'
-                                    ? 'rgba(var(--tier-transcendent-rgb),0.2)'
-                                    : a.tier === 'super-supreme'
-                                      ? 'rgba(var(--tier-super-rgb),0.2)'
-                                      : a.tier === 'supreme'
-                                        ? 'rgba(var(--tier-supreme-rgb),0.2)'
-                                        : `${a.color}20`,
-                                  color: a.tier === 'transcendent'
-                                    ? 'var(--tier-transcendent)'
-                                    : a.tier === 'super-supreme'
-                                      ? 'var(--tier-super)'
-                                      : a.tier === 'supreme'
-                                        ? 'var(--tier-supreme)'
-                                        : a.color,
-                                  border: `1px solid ${a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.4)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.4)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.4)' : a.color + '40'}`,
+                                  background: a.tier === 'super-transcendent'
+                                    ? 'rgba(var(--tier-super-transcendent-rgb),0.2)'
+                                    : a.tier === 'transcendent'
+                                      ? 'rgba(var(--tier-transcendent-rgb),0.2)'
+                                      : a.tier === 'super-supreme'
+                                        ? 'rgba(var(--tier-super-rgb),0.2)'
+                                        : a.tier === 'supreme'
+                                          ? 'rgba(var(--tier-supreme-rgb),0.2)'
+                                          : `${a.color}20`,
+                                  color: a.tier === 'super-transcendent'
+                                    ? 'var(--tier-super-transcendent)'
+                                    : a.tier === 'transcendent'
+                                      ? 'var(--tier-transcendent)'
+                                      : a.tier === 'super-supreme'
+                                        ? 'var(--tier-super)'
+                                        : a.tier === 'supreme'
+                                          ? 'var(--tier-supreme)'
+                                          : a.color,
+                                  border: `1px solid ${a.tier === 'super-transcendent' ? 'rgba(var(--tier-super-transcendent-rgb),0.4)' : a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.4)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.4)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.4)' : a.color + '40'}`,
                                 }}
                               >
                                 {a.icon} {a.label} {isExpanded ? '▾' : '▸'}
@@ -947,11 +970,11 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                 if (!detail) return null
                                 return (
                                   <div key={i} className="p-3 rounded-lg" style={{
-                                    background: a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.06)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.06)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.06)' : `${a.color}08`,
-                                    border: `1px solid ${a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.2)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.2)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.2)' : a.color + '25'}`,
+                                    background: a.tier === 'super-transcendent' ? 'rgba(var(--tier-super-transcendent-rgb),0.06)' : a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.06)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.06)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.06)' : `${a.color}08`,
+                                    border: `1px solid ${a.tier === 'super-transcendent' ? 'rgba(var(--tier-super-transcendent-rgb),0.2)' : a.tier === 'transcendent' ? 'rgba(var(--tier-transcendent-rgb),0.2)' : a.tier === 'super-supreme' ? 'rgba(var(--tier-super-rgb),0.2)' : a.tier === 'supreme' ? 'rgba(var(--tier-supreme-rgb),0.2)' : a.color + '25'}`,
                                   }}>
                                     <p className="text-xs font-bold mb-1" style={{
-                                      color: a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
+                                      color: a.tier === 'super-transcendent' ? 'var(--tier-super-transcendent)' : a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color
                                     }}>
                                       {a.icon} {a.label}
                                     </p>
@@ -964,7 +987,7 @@ export default function AlignmentDashboard({ profile, navLinks = [] }: { profile
                                     <ul className="space-y-1">
                                       {detail.examples.map((ex, j) => (
                                         <li key={j} className="text-[11px] flex items-start gap-1.5" style={{ color: 'var(--text-primary)' }}>
-                                          <span style={{ color: a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>›</span> {ex}
+                                          <span style={{ color: a.tier === 'super-transcendent' ? 'var(--tier-super-transcendent)' : a.tier === 'transcendent' ? 'var(--tier-transcendent)' : a.tier === 'super-supreme' ? 'var(--tier-super)' : a.tier === 'supreme' ? 'var(--tier-supreme)' : a.color }}>›</span> {ex}
                                         </li>
                                       ))}
                                     </ul>

@@ -18,6 +18,8 @@
   --tier-super-rgb: 255, 107, 43;
   --tier-transcendent: #E040FB;
   --tier-transcendent-rgb: 224, 64, 251;
+  --tier-super-transcendent: #E0E7FF;
+  --tier-super-transcendent-rgb: 224, 231, 255;
   --glow-opacity: 0.15;
   --glow-inset-opacity: 0.05;
   --terminal-line-opacity: 0.3;
@@ -41,6 +43,8 @@
   --tier-super-rgb: 212, 68, 10;
   --tier-transcendent: #AB47BC;
   --tier-transcendent-rgb: 171, 71, 188;
+  --tier-super-transcendent: #3730A3;
+  --tier-super-transcendent-rgb: 55, 48, 163;
   --glow-opacity: 0.25;
   --glow-inset-opacity: 0.08;
   --terminal-line-opacity: 0.5;

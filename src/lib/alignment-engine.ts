@@ -1,7 +1,7 @@
 import { type Planet } from './planetary-hours'
 
 export type AlignmentTheme = 'financial' | 'love' | 'health' | 'creativity' | 'spiritual'
-export type AlignmentTier = 'standard' | 'supreme' | 'super-supreme' | 'transcendent'
+export type AlignmentTier = 'standard' | 'supreme' | 'super-supreme' | 'transcendent' | 'super-transcendent'
 
 export interface ZRContext {
   /** Whether any lot's L4 ruler matches this hour's planet */
@@ -36,11 +36,11 @@ interface AlignmentRule {
 }
 
 export const THEME_LOT_RELEVANCE: Record<AlignmentTheme, string[]> = {
-  financial: ['victory', 'spirit'],
-  love: ['eros', 'fortune'],
-  health: ['fortune', 'victory'],
-  creativity: ['spirit', 'eros'],
-  spiritual: ['spirit', 'fortune'],
+  financial: ['victory'],
+  love: ['eros'],
+  health: ['fortune'],
+  creativity: ['spirit'],
+  spiritual: ['spirit'],
 }
 
 const ALIGNMENT_RULES: AlignmentRule[] = [
@@ -101,6 +101,7 @@ const TIER_LABELS: Record<AlignmentTier, string> = {
   'supreme': 'Supreme Alignment',
   'super-supreme': 'Super Supreme Alignment',
   'transcendent': 'Transcendent Alignment',
+  'super-transcendent': 'Super Transcendent Alignment',
 }
 
 const TIER_SUGGESTIONS: Record<AlignmentTier, Record<AlignmentTheme, string>> = {
@@ -126,11 +127,18 @@ const TIER_SUGGESTIONS: Record<AlignmentTier, Record<AlignmentTheme, string>> = 
     spiritual: 'SUPER SUPREME: Month, day, hour, AND planetary energies are ALL unified in spiritual frequency. This is an extraordinarily rare portal — profound revelations, karmic clarity, and transcendent experiences are possible.',
   },
   'transcendent': {
-    financial: 'TRANSCENDENT: All five layers converge — numerology (hour, day, month), planetary hour, AND your natal chart\'s Zodiacal Releasing time-lord ALL confirm this financial window. Your birth chart wrote this moment into your timeline. Act with absolute conviction.',
-    love: 'TRANSCENDENT: Every timing layer in existence is synchronized for love — your numerology stack, the planetary hour, AND your natal Zodiacal Releasing period. This is a fated window for connection. The cosmos and your birth chart agree: open your heart now.',
-    health: 'TRANSCENDENT: Five independent timing systems are unified for vitality. Your numerological cycles, the planetary hour, AND your natal time-lord period ALL point to physical transformation. Your body was born to peak in this moment.',
-    creativity: 'TRANSCENDENT: The rarest creative convergence possible — numerology, planetary hours, AND your natal Zodiacal Releasing are ALL channeling creative energy simultaneously. This is the window your birth chart encoded for your most important creative work.',
-    spiritual: 'TRANSCENDENT: All five layers of cosmic timing converge in spiritual frequency. Your numerology, the planetary hour, AND your natal time-lord period are unified. This is a fated spiritual portal — the kind of moment mystics wait lifetimes for.',
+    financial: 'TRANSCENDENT: Your Lot of Victory confirms this is a prosperous period for achievement, AND the planetary hour and your personal hour are aligned for wealth. Your birth chart endorses this financial window — act with conviction.',
+    love: 'TRANSCENDENT: Your Lot of Eros is in a benefic period for desire and attraction, AND the planetary hour and personal hour are synchronized for love. Your birth chart says this is your moment — open your heart.',
+    health: 'TRANSCENDENT: Your Lot of Fortune signals a prosperous period for your body and material well-being, AND the planetary hour and personal hour converge on vitality. Your birth chart confirms this health window.',
+    creativity: 'TRANSCENDENT: Your Lot of Spirit is in a benefic period for purpose and agency, AND the planetary hour and personal hour channel creative energy. Your birth chart is fueling your creative fire right now.',
+    spiritual: 'TRANSCENDENT: Your Lot of Spirit confirms a prosperous period for purpose and inner work, AND the planetary hour and personal hour are tuned to spiritual frequency. This is a fated portal for transcendence.',
+  },
+  'super-transcendent': {
+    financial: 'SUPER TRANSCENDENT: The ultimate financial convergence — your Lot of Victory is benefic, the planetary hour channels wealth, AND both your personal hour and personal month are locked in. Every layer of timing, cosmic and natal, says this is the window. Execute your biggest move.',
+    love: 'SUPER TRANSCENDENT: The rarest love alignment possible — your Lot of Eros is prosperous, the planetary hour is attuned to connection, AND your personal hour and month are both resonating love frequencies. This is the moment your birth chart wrote for your heart.',
+    health: 'SUPER TRANSCENDENT: Total vitality convergence — your Lot of Fortune signals prosperous health, the planetary hour channels physical energy, AND your personal hour and month are both aligned. Transform your body in this window — your birth chart insists.',
+    creativity: 'SUPER TRANSCENDENT: The absolute peak of creative power — your Lot of Spirit is benefic, the planetary hour inspires, AND your personal hour and month are both in creative resonance. This is the rarest window your birth chart encoded for your most important work.',
+    spiritual: 'SUPER TRANSCENDENT: Every layer of cosmic and natal timing converges on spiritual awakening. Your Lot of Spirit is prosperous, the planetary hour is sacred, AND your personal hour and month are unified. This is the kind of moment mystics wait lifetimes for.',
   },
 }
 
@@ -158,12 +166,22 @@ export function findAlignments(
     const dayMatches = rule.personalHours.includes(personalDay)
     const monthMatches = rule.personalHours.includes(personalMonth)
 
-    const themeZrQualified = zrContext && (
+    // ZR benefic check: relevant lot for this theme has benefic/mildly-benefic L4,
+    // OR cosmic convergence (3+ lots benefic) overrides per-theme requirement
+    const lotBenefic = zrContext && (
       zrContext.themeRelevantBenefic[rule.theme] || zrContext.isCosmicConvergence
     )
 
+    // Tier hierarchy (highest first):
+    // Super Transcendent: Lot benefic + Planet + PH + Month
+    // Transcendent:       Lot benefic + Planet + PH
+    // Super Supreme:      Planet + PH + Day + Month
+    // Supreme:            Planet + PH + Day
+    // Standard:           Planet + PH
     let tier: AlignmentTier = 'standard'
-    if (dayMatches && monthMatches && themeZrQualified) {
+    if (lotBenefic && monthMatches) {
+      tier = 'super-transcendent'
+    } else if (lotBenefic) {
       tier = 'transcendent'
     } else if (dayMatches && monthMatches) {
       tier = 'super-supreme'
@@ -176,7 +194,7 @@ export function findAlignments(
       ? rule.label
       : `${rule.label} — ${tierLabel}`
 
-    const iconPrefix = tier === 'transcendent' ? '🌌' : tier === 'super-supreme' ? '👑' : tier === 'supreme' ? '⚜️' : ''
+    const iconPrefix = tier === 'super-transcendent' ? '💎' : tier === 'transcendent' ? '🌌' : tier === 'super-supreme' ? '👑' : tier === 'supreme' ? '⚜️' : ''
 
     return {
       theme: rule.theme,

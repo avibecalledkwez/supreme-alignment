@@ -29,7 +29,8 @@ const MINOR_YEARS: Record<ZodiacSign, number> = {
   Aquarius: 30, Pisces: 12,
 }
 
-const TOTAL_CYCLE_YEARS = 129
+// Sum of all 12 minor years: 15+8+20+25+19+20+8+15+12+27+30+12 = 211
+const TOTAL_CYCLE_YEARS = 211
 
 export const SIGN_RULERS: Record<ZodiacSign, Planet> = {
   Aries: 'Mars', Taurus: 'Venus', Gemini: 'Mercury', Cancer: 'Moon',

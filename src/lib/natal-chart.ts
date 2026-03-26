@@ -78,8 +78,11 @@ function calculateAscendant(utcDate: Date, lat: number, lng: number): number {
 }
 
 function isDayChartCalc(sunLon: number, ascLon: number): boolean {
+  // Sun is above the horizon (day chart) when its longitude is
+  // between the Ascendant and Descendant going counter-clockwise,
+  // i.e. 0–180° ahead of the Ascendant in ecliptic longitude.
   const diff = ((sunLon - ascLon) % 360 + 360) % 360
-  return diff > 180
+  return diff < 180
 }
 
 export function calculateNatalChart(input: NatalChartInput): NatalChartData {
